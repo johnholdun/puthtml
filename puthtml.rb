@@ -1,11 +1,12 @@
-require 'sinatra/base'
-require 'active_support/all'
-
-AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = ENV['AWS_SECRET_ACCESS_KEY']
-Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']]
+require 'rack-flash'
 
 class PutHTML < Sinatra::Base
+  AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
+  AWS_SECRET_ACCESS_KEY = ENV['AWS_SECRET_ACCESS_KEY']
+  Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']]
+
+  use Rack::Flash
+
   before do
     if request.path != '/' and request.path =~ %r[/$]
       redirect request.path[0 .. -2]
@@ -14,18 +15,25 @@ class PutHTML < Sinatra::Base
   end
 
   get '/' do
+    @error = flash[:error]
     erb :'index.html'
   end
 
   get '/*' do
     path = params[:splat].first
     path.sub! /\.html$/, ''
-    path.sub! /[^a-zA-Z0-9_-]/, ''
+    clean_path = path.sub /[^a-zA-Z0-9_-]/, ''
+    
+    if path != clean_path
+      redirect to ("/#{ clean_path }")
+      return
+    end
 
     output = Bucket.objects["#{ path }.html"].read rescue nil
     if output
       return output
     else
+      flash[:error] = 'That page does not exist. Put it there!'
       redirect to('/')
     end
   end
@@ -58,7 +66,8 @@ class PutHTML < Sinatra::Base
     end
 
     if @error
-      return erb(:'index.html')
+      flash[:error] = @error
+      redirect to('/')
     else
     end
   end
