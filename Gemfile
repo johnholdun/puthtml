@@ -4,7 +4,6 @@ gem 'rack'
 gem 'sinatra'
 gem 'activesupport', require: 'active_support'
 gem 'aws-sdk'
-gem 'mimemagic'
 gem 'rack-flash3'
 gem 'redis'
 

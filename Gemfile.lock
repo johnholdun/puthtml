@@ -35,7 +35,6 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
-    mimemagic (0.2.1)
     minitest (4.7.5)
     multi_json (1.8.2)
     nokogiri (1.5.9)
@@ -87,7 +86,6 @@ DEPENDENCIES
   aws-sdk
   dm-sqlite-adapter
   foreman
-  mimemagic
   rack
   rack-flash3
   redis
