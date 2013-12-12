@@ -14,7 +14,7 @@
     <h1>Put HTML</h1>
     <form method="post" action="/" id="form_create" enctype="multipart/form-data">
       <% if @error %>
-        <p class="error"><%= @error %>
+        <p class="error"><%= @error %></p>
       <% end %>
       <input type="file" name="file" id="file">
       <button>Put HTML</button>
