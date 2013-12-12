@@ -7,6 +7,16 @@ class PutHTML < Sinatra::Base
 
   use Rack::Flash
 
+  REDIS_URL = ENV['REDISCLOUD_URL']
+  REDIS = if REDIS_URL
+    uri = URI.parse(REDIS_URL)
+    Redis.new host: uri.host, port: uri.port, password: uri.password
+  else
+    Redis.new
+  end
+
+  REDIS.lpush 'pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub /\.html$/, '' }
+
   before do
     if request.path != '/' and request.path =~ %r[/$]
       redirect request.path[0 .. -2]
@@ -16,6 +26,7 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
+    @pages = REDIS.lrange 'pages', 0, 10
     erb :'index.html'
   end
 
@@ -53,6 +64,7 @@ class PutHTML < Sinatra::Base
           path.sub! /[^a-zA-Z0-9_-]/, ''
 
           Bucket.objects["#{ path }.html"].write open(tmpfile).read, acl: :authenticated_read
+          REDIS.lpush 'pages', path
           redirect to("/#{ path }")
           return
         else

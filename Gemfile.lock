@@ -52,6 +52,7 @@ GEM
       ffi (>= 0.5.0)
     rb-kqueue (0.2.0)
       ffi (>= 0.5.0)
+    redis (3.0.3)
     rerun (0.8.0)
       listen
     ripl (0.6.3)
@@ -89,6 +90,7 @@ DEPENDENCIES
   mimemagic
   rack
   rack-flash3
+  redis
   rerun
   sinatra
   tux

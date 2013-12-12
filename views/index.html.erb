@@ -3,11 +3,14 @@
   <head>
     <title>Put HTML</title>
     <style>
-      * { margin: 0; font-family: sans-serif; }
+      * { margin: 0; padding: 0; font-family: sans-serif; }
       body { margin: 5em; }
-      h1 { margin-bottom: 1em; }
+      h1, form { margin-bottom: 1em; }
       p.error { color: #900; margin-bottom: 1em; }
       button { visibility: hidden; }
+      h2 { margin: 2em 0 0.5em; font-size: 1em; }
+      #pages { list-style: none; }
+      #pages a { color: #009; text-decoration: none; }
       .who-mike-jones { margin: 6em 0 0; }
       .who-mike-jones a { color: #ccc; text-decoration: none; }
     </style>
@@ -21,12 +24,23 @@
       <input type="file" name="file" id="file">
       <button>Put HTML</button>
     </form>
+
+    <% if @pages.size > 0 %>
+      <h2>Latest pages</h2>
+
+      <ul id="pages">
+        <% @pages.each do |page| %>
+          <li><a href="/<%= page %>"><%= page %></a></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <p class="who-mike-jones"><small><a href="http://johnholdun.com">John Holdun</a></small></p>
+
     <script>
       document.getElementById("file").addEventListener("change", function() {
         document.getElementById("form_create").submit()
       })
     </script>
-
-    <p class="who-mike-jones"><small><a href="http://johnholdun.com">John Holdun</a></small></p>
   </body>
 </html>
