@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Put HTML</title>
+    <meta name='viewport' content='width=device-width'>
     <style>
       * { margin: 0; padding: 0; font-family: sans-serif; }
       body { margin: 5em; }
@@ -18,6 +19,12 @@
       .who-mike-jones { margin: 6em 0 0; }
       .who-mike-jones a { color: #ccc; text-decoration: none; }
       .who-mike-jones a:hover { color: #99e; }
+
+      @media (max-width: 640px) {
+        body {
+          margin: 1em;
+        }
+      }
     </style>
   </head>
   <body>
