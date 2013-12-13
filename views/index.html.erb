@@ -10,8 +10,11 @@
       .sign-in { color: #fff; background: #209be9; text-decoration: none; display: inline-block; padding: 0.5em 1em; box-shadow: 0 1px 1px #ccc; }
       button { visibility: hidden; }
       h2 { margin: 2em 0 0.5em; font-size: 1em; }
-      #pages { list-style: none; }
-      #pages a { color: #009; text-decoration: none; }
+      #documents { list-style: none; }
+      #documents li { margin-bottom: 0.5em; }
+      #documents a { color: #009; text-decoration: none; display: block; }
+      #documents strong { font-weight: normal; display: block; }
+      #documents em { font-style: normal; font-size: 0.75em; }
       .who-mike-jones { margin: 6em 0 0; }
       .who-mike-jones a { color: #ccc; text-decoration: none; }
       .who-mike-jones a:hover { color: #99e; }
@@ -33,12 +36,17 @@
       <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
     <% end %>
 
-    <% if @pages.size > 0 %>
-      <h2>Latest pages</h2>
+    <% if @documents.size > 0 %>
+      <h2>Latest documents</h2>
 
-      <ul id="pages">
-        <% @pages.each do |page| %>
-          <li><a href="/<%= page %>"><%= page %></a></li>
+      <ul id="documents">
+        <% @documents.each do |doc| %>
+          <li>
+            <a href="<%= doc.path %>">
+              <strong><%= doc.title %></strong>
+              <em><%= doc.user.try(:name) %></em>
+            </a>
+          </li>
         <% end %>
       </ul>
     <% end %>

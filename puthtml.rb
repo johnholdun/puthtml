@@ -3,6 +3,7 @@ require 'omniauth-twitter'
 require 'dm-core'
 require 'dm-migrations'
 require 'rack-flash'
+require 'active_support/all'
 
 require_relative 'models/init'
 
@@ -71,7 +72,7 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
-    @pages = REDIS.lrange 'pages', 0, 10
+    @documents = REDIS.lrange('pages', 0, 10).map{ |path| Document.new(path: path) }
     erb :'index.html'
   end
 
