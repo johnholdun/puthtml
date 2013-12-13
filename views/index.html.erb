@@ -5,8 +5,9 @@
     <style>
       * { margin: 0; padding: 0; font-family: sans-serif; }
       body { margin: 5em; }
-      h1, form { margin-bottom: 1em; }
-      p.error { color: #900; margin-bottom: 1em; }
+      h1, form, p { margin-bottom: 1em; }
+      p.error { color: #900; }
+      .sign-in { color: #fff; background: #209be9; text-decoration: none; display: inline-block; padding: 0.5em 1em; box-shadow: 0 1px 1px #ccc; }
       button { visibility: hidden; }
       h2 { margin: 2em 0 0.5em; font-size: 1em; }
       #pages { list-style: none; }
@@ -17,13 +18,19 @@
   </head>
   <body>
     <h1>Put HTML</h1>
-    <form method="post" action="/" id="form_create" enctype="multipart/form-data">
-      <% if @error %>
-        <p class="error"><%= @error %></p>
-      <% end %>
-      <input type="file" name="file" id="file">
-      <button>Put HTML</button>
-    </form>
+
+    <% if @error %>
+      <p class="error"><%= @error %></p>
+    <% end %>
+
+    <% if current_user %>
+      <form method="post" action="/" id="form_create" enctype="multipart/form-data">
+        <input type="file" name="file" id="file">
+        <button>Put HTML</button>
+      </form>
+    <% else %>
+      <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
+    <% end %>
 
     <% if @pages.size > 0 %>
       <h2>Latest pages</h2>

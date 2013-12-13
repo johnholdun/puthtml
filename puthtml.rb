@@ -1,6 +1,25 @@
+require 'omniauth'
+require 'omniauth-twitter'
+require 'dm-core'
+require 'dm-migrations'
 require 'rack-flash'
 
+require_relative 'models/init'
+
 class PutHTML < Sinatra::Base
+  use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
+
+  configure do
+    set :session_secret, ENV['COOKIE_SECRET']
+    enable :sessions
+  end
+
+  helpers do
+    def current_user
+      @current_user ||= User.get(session[:user_id]) if session[:user_id]
+    end
+  end
+
   AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
   AWS_SECRET_ACCESS_KEY = ENV['AWS_SECRET_ACCESS_KEY']
   Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']]
@@ -56,9 +75,26 @@ class PutHTML < Sinatra::Base
     erb :'index.html'
   end
 
+  get '/auth/twitter/callback' do
+    auth = request.env["omniauth.auth"]
+    user = User.first_or_new({ uid: auth["uid"] }, { created_at: Time.now })
+    user.name = auth["info"]["nickname"]
+    user.save
+
+    session[:user_id] = user.id
+
+    # after successful sign-in or sign-out
+    redirect '/'
+  end
+
+  get '/sign-out' do
+    session.delete(:user_id)
+    redirect '/'
+  end
+
   get '/*' do
-    path = params[:splat].first
-    clean_path = path.sub(/\.html?$/, '').sub /[^a-zA-Z0-9_\-.]/, ''
+    path = params[:splat].join('/')
+    clean_path = path.sub(/\.html?$/, '').sub /[^a-zA-Z0-9_\-.\/]/, ''
     
     if path != clean_path
       redirect to ("/#{ clean_path }")
@@ -77,37 +113,41 @@ class PutHTML < Sinatra::Base
   end
 
   post '/' do
-    if params[:file].is_a? Hash
-      tmpfile = params[:file][:tempfile]
-      name = params[:file][:filename]
-    end
-
-    if tmpfile and name
-      type = %x[file -b --mime-type #{ tmpfile.path }].strip
-      if type == 'text/plain'
-        type = MIME_TYPES_BY_EXTENSION[File.extname(name).to_s]
+    if current_user.nil?
+      @error = 'You need to sign in first!'
+    else
+      if params[:file].is_a? Hash
+        tmpfile = params[:file][:tempfile]
+        name = params[:file][:filename]
       end
 
-      if ACCEPTABLE_MIME_TYPES.include? type.to_s
-        if tmpfile.size <= 1_048_576
-          path = name
-          path.sub! /#{ File.extname(path) }$/, ''
-          path.sub! /[^a-zA-Z0-9_-]/, ''
+      if tmpfile and name
+        type = %x[file -b --mime-type #{ tmpfile.path }].strip
+        if type == 'text/plain'
+          type = MIME_TYPES_BY_EXTENSION[File.extname(name).to_s]
+        end
 
-          path += EXTNAMES_BY_MIME_TYPE[type]
+        if ACCEPTABLE_MIME_TYPES.include? type.to_s
+          if tmpfile.size <= 1_048_576
+            path = name
+            path.sub! /#{ File.extname(path) }$/, ''
+            path.sub! /[^a-zA-Z0-9_-]/, ''
 
-          Bucket.objects[path].write open(tmpfile).read, acl: :authenticated_read
-          REDIS.lpush 'pages', path.sub(/\.html$/, '')
-          redirect to("/#{ path }")
-          return
+            path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
+
+            Bucket.objects[path].write open(tmpfile).read, acl: :authenticated_read
+            REDIS.lpush 'pages', path.sub(/\.html$/, '')
+            redirect to("/#{ path }")
+            return
+          else
+            @error = 'Your file is too large!'
+          end
         else
-          @error = 'Your file is too large!'
+          @error = 'Your file is not an acceptable type!' + " (#{ type })"
         end
       else
-        @error = 'Your file is not an acceptable type!' + " (#{ type })"
+        @error = 'No file selected'
       end
-    else
-      @error = 'No file selected'
     end
 
     if @error
@@ -117,3 +157,7 @@ class PutHTML < Sinatra::Base
     end
   end
 end
+
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
+DataMapper.finalize
+DataMapper.auto_upgrade!
