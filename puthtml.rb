@@ -33,16 +33,6 @@ class PutHTML < Sinatra::Base
     application/yaml
   ]
 
-  MIME_TYPES_BY_EXTENSION = {
-    '.html' => 'text/html',
-    '.htm' => 'text/html',
-    '.json' => 'application/json',
-    '.css' => 'text/css',
-    '.js' => 'application/javascript',
-    '.yml' => 'application/yaml',
-    '.yaml' => 'application/yaml'
-  }
-
   EXTNAMES_BY_MIME_TYPE = {
     'text/html' => '.html',
     'application/json' => '.json',
@@ -105,7 +95,7 @@ class PutHTML < Sinatra::Base
     path += '.html' if File.extname(path) == ''
     output = Bucket.objects[path].read rescue nil
     if output
-      headers['Content-Type'] = MIME_TYPES_BY_EXTENSION[File.extname(path)]
+      headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
       return output
     else
       flash[:error] = 'That page does not exist. Put it there!'
@@ -125,7 +115,7 @@ class PutHTML < Sinatra::Base
       if tmpfile and name
         type = %x[file -b --mime-type #{ tmpfile.path }].strip
         if type == 'text/plain'
-          type = MIME_TYPES_BY_EXTENSION[File.extname(name).to_s]
+          type = Rack::Mime::MIME_TYPES[File.extname(name).to_s]
         end
 
         if ACCEPTABLE_MIME_TYPES.include? type.to_s
