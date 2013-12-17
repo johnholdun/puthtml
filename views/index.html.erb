@@ -52,7 +52,7 @@
             <a href="<%= doc.path %>" target="_blank">
               <strong><%= doc.title %></strong>
               <br />
-              <em>author<%= doc.user.try(:name) %></em>
+              <em><%= doc.user.try(:name) %></em>
             </a>
           </li>
         <% end %>
