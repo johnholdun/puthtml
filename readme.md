@@ -2,10 +2,17 @@
 
 Upload an HTML file <1mb to an S3 bucket, then serve it.
 
-Make sure that AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_BUCKET_NAME are set in your env. Then go crazy.
+Right now you need 10+ htmls in your amazon s3 bucket to start. Also setup a
+Twitter app for Sign-In at dev.twitter.com
 
-Also before you go crazy setup your Twitter app and TWITTER_KEY and TWITTER_SECRET in your env.
+Set up in your env:
 
-ALSO right now you need 10+ htmls in your amazon s3 bucket to start.
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_BUCKET_NAME
+- TWITTER_CONSUMER_KEY
+- TWITTER_CONSUMER_SECRET
+
+run: rackup config.rb
 
 Try it here: http://puthtml.herokuapp.com
