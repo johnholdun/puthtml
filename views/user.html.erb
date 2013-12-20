@@ -1,0 +1,14 @@
+<% if @documents.size > 0 %>
+  <h2>Latest documents by <%= @username %></h2>
+
+  <ul id="documents">
+    <% @documents.each do |doc| %>
+      <li>
+        <a href="<%= doc.path %>">
+          <strong><%= doc.title %></strong>
+          <em><%= doc.user.try(:name) %></em>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

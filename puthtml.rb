@@ -51,7 +51,9 @@ class PutHTML < Sinatra::Base
     Redis.new
   end
 
-  REDIS.lpush 'pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub /\.html$/, '' }
+  REDIS.ltrim('pages', -1, 0)
+
+  REDIS.lpush('pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub(/\.html$/, '') })
 
   before do
     if request.path != '/' and request.path =~ %r[/$]
@@ -63,7 +65,7 @@ class PutHTML < Sinatra::Base
   get '/' do
     @error = flash[:error]
     @documents = REDIS.lrange('pages', 0, 10).map{ |path| Document.new(path: path) }
-    erb :'index.html'
+    erb :'index.html', layout: true
   end
 
   get '/auth/twitter/callback' do
@@ -85,11 +87,19 @@ class PutHTML < Sinatra::Base
 
   get '/*' do
     path = params[:splat].join('/')
-    clean_path = path.sub(/\.html?$/, '').sub /[^a-zA-Z0-9_\-.\/]/, ''
-    
+
+    unless (path.include?('/')) then #try user page
+      @username = params[:splat].first
+      @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@username}\/.*?/)}.map { |p| Document.new(path: p) }
+      unless @documents.nil?
+        return erb :'user.html', layout: true
+      end
+    end
+
+    clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+
     if path != clean_path
-      redirect to ("/#{ clean_path }")
-      return
+      return redirect to ("/#{ clean_path }")
     end
 
     path += '.html' if File.extname(path) == ''
@@ -121,8 +131,8 @@ class PutHTML < Sinatra::Base
         if ACCEPTABLE_MIME_TYPES.include? type.to_s
           if tmpfile.size <= 1_048_576
             path = name
-            path.sub! /#{ File.extname(path) }$/, ''
-            path.sub! /[^a-zA-Z0-9_-]/, ''
+            path.sub!(/#{ File.extname(path) }$/, '')
+            path.sub!(/[^a-zA-Z0-9_-]/, '')
 
             path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
