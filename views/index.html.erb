@@ -1,23 +1,28 @@
 <% if current_user %>
-  <form method="post" action="/" id="form_create" enctype="multipart/form-data">
-    <ul>
-      <li>
-        <label for="file">File</label>
-        <input type="file" name="file" id="file">
-      </li>
-      <li>
-        <label for="path">Path (leave blank for auto)</label>
-        <div class="input-with-extra">
-          <span>/<%= current_user.name %>/</span>
-          <input type="text" name="path" id="path">
-        </div>
-      </li>
-    </ul>
+  <div id="user">
+    <p class="status">
+      <a href="/<%= current_user.name %>" target="_blank"><%= current_user.name %></a>
+      <small><a class="sign-out" href="/sign-out">Sign out</a></small>
+    </p>
 
-    <button>Put HTML</button>
-  </form>
+    <form method="post" action="/" id="form_create" enctype="multipart/form-data">
+      <ul>
+        <li>
+          <label for="file">File</label>
+          <input type="file" name="file" id="file">
+        </li>
+        <li>
+          <label for="path">Path (leave blank for auto)</label>
+          <div class="input-with-extra">
+            <span>/<%= current_user.name %>/</span>
+            <input type="text" name="path" id="path">
+          </div>
+        </li>
+      </ul>
 
-  <p><a class="sign-out" href="/sign-out">Sign out</a></p>
+      <button>Put HTML</button>
+    </form>
+  </div>
 <% else %>
   <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
 <% end %>
