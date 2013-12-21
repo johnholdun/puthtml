@@ -104,7 +104,29 @@ class PutHTML < Sinatra::Base
     auth = request.env["omniauth.auth"]
     user = User.first_or_new({ uid: auth["uid"] }, { created_at: Time.now })
     user.name = auth["info"]["nickname"]
+
+    first_time = (user.new? or user.created_at.to_i < 1387668050) # legacy lol
     user.save
+
+    # let's start this user off right
+    if first_time
+      profile_source = auth['extra']['raw_info']
+      profile = Hash[* %w[name location description url].map{ |k| [k, profile_source[k]] }.flatten]
+
+      # expand that dirty taco
+      if profile['url'].present? and profile['url'] =~ /^http:\/\/t\.co\//
+        uri = URI.parse profile['url']
+        Net::HTTP.start(uri.host) do |http|
+          http.open_timeout = 2
+          http.read_timeout = 2
+          req = Net::HTTP::Head.new(uri.path)
+          response = http.request(req)
+          profile['url'] = response['location']
+        end
+      end
+
+      Document.write "#{ user.name }/profile.json", profile.to_json
+    end
 
     session[:user_id] = user.id
 
@@ -173,10 +195,8 @@ class PutHTML < Sinatra::Base
 
             path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
-            Bucket.objects[path].write open(tmpfile).read, acl: :authenticated_read
-            zadd_params = [Time.now.to_i, path.sub(/\.html$/, '')]
-            REDIS.zadd 'documents', zadd_params
-            REDIS.zadd "documents.#{ current_user.name }", zadd_params
+            Document.write path, open(tmpfile).read
+
             redirect to("/#{ path }")
             return
           else

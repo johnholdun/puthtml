@@ -37,4 +37,11 @@ class Document
   def filename
     @filename ||= "#{ slug }.#{ type }"
   end
+
+  def self.write path, contents
+    ::PutHTML::Bucket.objects[path].write contents, acl: :authenticated_read
+    zadd_params = [Time.now.to_i, path.sub(/\.html$/, '')]
+    ::PutHTML::REDIS.zadd 'documents', zadd_params
+    ::PutHTML::REDIS.zadd "documents.#{ path.split('/').first }", zadd_params
+  end
 end
