@@ -39,4 +39,9 @@ h2, h3 { margin: 2em 0 0.5em; font-size: 1em; }
   body {
     margin: 1em;
   }
+
+  .unit {
+    float: none;
+    margin-right: 0;
+  }
 }
