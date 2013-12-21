@@ -83,6 +83,11 @@ class PutHTML < Sinatra::Base
   end
 
   before do
+    if RACK_ENV == 'production' and ENV.key?('APP_HOST') and request.host != ENV['APP_HOST']
+      redirect "#{ request.scheme }://#{ ENV['APP_HOST'] }#{ request.path }"
+      return
+    end
+
     if request.path != '/' and request.path =~ %r[/$]
       redirect request.path[0 .. -2]
       return
