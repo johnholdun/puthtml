@@ -85,16 +85,16 @@ class PutHTML < Sinatra::Base
     redirect '/'
   end
 
+  get '/:username' do
+    @username = params[:username]
+    @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@username}\/.*?/)}.map { |p| Document.new(path: p) }
+    unless @documents.nil?
+      return erb :'user.html', layout: true
+    end
+  end
+
   get '/*' do
     path = params[:splat].join('/')
-
-    unless (path.include?('/')) then #try user page
-      @username = params[:splat].first
-      @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@username}\/.*?/)}.map { |p| Document.new(path: p) }
-      unless @documents.nil?
-        return erb :'user.html', layout: true
-      end
-    end
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
 
