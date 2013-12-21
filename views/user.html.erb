@@ -1,5 +1,26 @@
+<h2>
+  <%= @user.name %>
+  <% if @user.profile.has? :name %>
+    (<%= @user.profile.name.strip_tags %>)
+  <% end %>
+</h2>
+
+<% if @user.profile.has? :url %>
+  <p class="url"><a href="<%= @user.profile.url %>" target="_blank"><%= @user.profile.url.strip_tags %></a></p>
+<% end %>
+
+<% if @user.profile.has? :location %>
+  <p class="location"><%= @user.profile.location.strip_tags %></p>
+<% end %>
+
+<% if @user.profile.has? :description %>
+  <p class="description"><%= @user.profile.description.strip_tags %></p>
+<% end %>
+
 <% if @documents.size > 0 %>
-  <h2>Latest documents by <%= @username %></h2>
+  <h3>
+    Latest documents by <%= @user.name %>
+  </h3>
 
   <ul id="documents">
     <% @documents.each do |doc| %>

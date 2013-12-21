@@ -6,6 +6,7 @@ require 'rack-flash'
 require 'active_support/all'
 
 require_relative 'models/init'
+require_relative 'lib/sanitizers.rb'
 
 class PutHTML < Sinatra::Base
   use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
@@ -86,8 +87,12 @@ class PutHTML < Sinatra::Base
   end
 
   get '/:username' do
-    @username = params[:username]
-    @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@username}\/.*?/)}.map { |p| Document.new(path: p) }
+    @user = User.first_or_new(name: params[:username])
+    profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
+    profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
+    @user.profile = profile if profile
+
+    @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@user.name}\/.*?/)}.map { |p| Document.new(path: p) }
     unless @documents.nil?
       return erb :'user.html', layout: true
     end
