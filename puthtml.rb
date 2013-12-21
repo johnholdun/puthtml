@@ -124,20 +124,21 @@ class PutHTML < Sinatra::Base
     else
       if params[:file].is_a? Hash
         tmpfile = params[:file][:tempfile]
-        name = params[:file][:filename]
+        filename = params[:file][:filename]
       end
 
-      if tmpfile and name
+      if tmpfile and filename
         type = %x[file -b --mime-type #{ tmpfile.path }].strip
         if type == 'text/plain'
-          type = Rack::Mime::MIME_TYPES[File.extname(name).to_s]
+          type = Rack::Mime::MIME_TYPES[File.extname(filename).to_s]
         end
 
         if ACCEPTABLE_MIME_TYPES.include? type.to_s
           if tmpfile.size <= 1_048_576
-            path = name
-            path.sub!(/#{ File.extname(path) }$/, '')
-            path.sub!(/[^a-zA-Z0-9_-]/, '')
+            path = filename
+            path = params[:path] if params[:path].to_s.strip.present?
+            path.sub!(/#{ File.extname(filename) }$/, '')
+            path.gsub!(/[^a-zA-Z0-9_\-\/]/, '')
 
             path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
