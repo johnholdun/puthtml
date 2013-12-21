@@ -25,7 +25,7 @@
   <ul id="documents">
     <% @documents.each do |doc| %>
       <li>
-        <a href="<%= doc.path %>">
+        <a href="<%= doc.path %>" target="_blank">
           <strong><%= doc.title %></strong>
           <em><%= doc.user.try(:name) %></em>
         </a>
