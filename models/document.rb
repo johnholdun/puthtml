@@ -34,6 +34,14 @@ class Document
     @title ||= @path.split('/').last
   end
 
+  def partial_path
+    return @partial_path if defined? @partial_path
+    user_name, *partial_path_parts, name = path.split('/')
+    @partial_path = partial_path_parts.join('/')
+    @partial_path = nil if @partial_path == ''
+    @partial_path
+  end
+
   def filename
     @filename ||= "#{ slug }.#{ type }"
   end
