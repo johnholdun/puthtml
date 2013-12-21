@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="<%= stylesheet_path 'application' %>">
   </head>
   <body>
-    <h1>Put HTML</h1>
+    <h1 id="title"><a href="/">Put HTML</a></h1>
 
     <% if @error %>
       <p class="error"><%= @error %></p>
@@ -14,11 +14,10 @@
 
     <%= yield %>
 
-    <p class="who-mike-jones">
+    <p class="who-mike-jones g unit">
       <small><a href="http://twitter.com/johnholdun">@johnholdun</a></small>
       <small><a href="http://twitter.com/negatendo">@negatendo</a></small>
       <small><a href="http://twitter.com/ckolderup">@ckolderup</a></small>
     </p>
-
   </body>
 </html>

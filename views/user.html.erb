@@ -1,4 +1,4 @@
-<div id="user">
+<div id="user" class="unit">
   <h2>
     <%= @user.name %>
     <% if @user.profile.has? :name %>
@@ -20,18 +20,20 @@
 </div>
 
 <% if @documents.size > 0 %>
-  <h3>
-    Latest documents by <%= @user.name %>
-  </h3>
+  <div class="unit">
+    <h3>
+      Latest documents by <%= @user.name %>
+    </h3>
 
-  <ul id="documents">
-    <% @documents.each do |doc| %>
-      <li>
-        <a href="<%= doc.path %>" target="_blank">
-          <strong><%= doc.title %></strong>
-          <em><%= doc.user.try(:name) %></em>
-        </a>
-      </li>
-    <% end %>
-  </ul>
+    <ul id="documents">
+      <% @documents.each do |doc| %>
+        <li>
+          <a href="<%= doc.path %>" target="_blank">
+            <strong><%= doc.title %></strong>
+            <em><%= doc.user.try(:name) %></em>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
 <% end %>
