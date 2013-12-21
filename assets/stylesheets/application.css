@@ -2,6 +2,7 @@
 body { margin: 5em; max-width: 75em; }
 h1, p { margin-bottom: 1em; }
 #title a { color: inherit; }
+#title a:before { content: "\261E "; color: #999; display: inline-block; margin-right: 0.25em; text-align: right; width: 2em; margin-left: -2.25em; }
 
 a { color: #009; text-decoration: none; }
 
@@ -41,13 +42,9 @@ h2, h3 { margin: 2em 0 0.5em; font-size: 1em; }
 .who-mike-jones a:hover { color: #99e; }
 
 @media (max-width: 640px) {
-  body {
-    margin: 1em;
-  }
+  body { margin: 1em; }
 
-  .unit {
-    float: none;
-    padding-right: 0;
-    max-width: 100%;
-  }
+  .unit { float: none; padding-right: 0; max-width: 100%; }
+
+  #title a:before { margin-left: 0em; width: auto; }
 }
