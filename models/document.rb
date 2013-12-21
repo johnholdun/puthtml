@@ -6,6 +6,7 @@ class Document
   property :slug,       String
   property :type,       String
   property :created_at, DateTime
+  property :updated_at, DateTime
 
   belongs_to :user
 
@@ -16,6 +17,7 @@ class Document
 
     user_name, *middle, filename = @path.split '/'
 
+    filename ||= user_name
     self.type = File.extname(filename)[1 .. -1] || 'html'
     @path.sub! /\.html$/, ''
 

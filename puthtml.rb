@@ -14,6 +14,10 @@ require 'sinatra/asset_pipeline'
 require_relative 'models/init'
 require_relative 'lib/sanitizers.rb'
 
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
+DataMapper.finalize
+DataMapper.auto_upgrade!
+
 class PutHTML < Sinatra::Base
   use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
 
@@ -64,7 +68,18 @@ class PutHTML < Sinatra::Base
   REDIS.ltrim('pages', -1, 0)
 
   if (Bucket.present? rescue false)
-    REDIS.lpush('pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub(/\.html$/, '') })
+    documents = Bucket.objects.map do |obj|
+      next if obj.key =~ /^_legacy\// # legacy duh
+      Document.new path: obj.key, updated_at: obj.last_modified
+    end
+
+    documents.compact! # just for legacy
+
+    REDIS.zadd 'documents', documents.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
+    documents.group_by(&:user_id).each do |user_id, docs|
+      next if docs.first.user.nil?
+      REDIS.zadd "documents.#{ docs.first.user.name }", docs.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
+    end
   end
 
   before do
@@ -76,7 +91,7 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
-    @documents = REDIS.lrange('pages', 0, 10).map{ |path| Document.new(path: path) }
+    @documents = REDIS.zrevrange('documents', 0, 10).map{ |path| Document.new(path: path) }
     erb :'index.html', layout: true
   end
 
@@ -103,7 +118,7 @@ class PutHTML < Sinatra::Base
     profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
     @user.profile = profile if profile
 
-    @documents = REDIS.lrange('pages', 0, 10).select{ |p| p.match(/#{@user.name}\/.*?/)}.map { |p| Document.new(path: p) }
+    @documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10).map{ |path| Document.new(path: path) }
     unless @documents.nil?
       return erb :'user.html', layout: true
     end
@@ -154,7 +169,9 @@ class PutHTML < Sinatra::Base
             path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
             Bucket.objects[path].write open(tmpfile).read, acl: :authenticated_read
-            REDIS.lpush 'pages', path.sub(/\.html$/, '')
+            zadd_params = [Time.now.to_i, path.sub(/\.html$/, '')]
+            REDIS.zadd 'documents', zadd_params
+            REDIS.zadd "documents.#{ current_user.name }", zadd_params
             redirect to("/#{ path }")
             return
           else
@@ -174,7 +191,3 @@ class PutHTML < Sinatra::Base
     end
   end
 end
-
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
-DataMapper.finalize
-DataMapper.auto_upgrade!
