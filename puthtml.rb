@@ -1,9 +1,15 @@
+require 'rubygems'
+require 'bundler/setup'
 require 'omniauth'
 require 'omniauth-twitter'
 require 'dm-core'
 require 'dm-migrations'
 require 'rack-flash'
 require 'active_support/all'
+
+Bundler.require
+
+require 'sinatra/asset_pipeline'
 
 require_relative 'models/init'
 require_relative 'lib/sanitizers.rb'
@@ -16,6 +22,9 @@ class PutHTML < Sinatra::Base
     enable :sessions
   end
 
+  set :assets_precompile, %w[*.css]
+  register Sinatra::AssetPipeline
+
   helpers do
     def current_user
       @current_user ||= User.get(session[:user_id]) if session[:user_id]
@@ -24,7 +33,7 @@ class PutHTML < Sinatra::Base
 
   AWS_ACCESS_KEY_ID = ENV['AWS_ACCESS_KEY_ID']
   AWS_SECRET_ACCESS_KEY = ENV['AWS_SECRET_ACCESS_KEY']
-  Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']]
+  Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']] rescue nil
 
   ACCEPTABLE_MIME_TYPES = %w[
     text/html
@@ -54,7 +63,9 @@ class PutHTML < Sinatra::Base
 
   REDIS.ltrim('pages', -1, 0)
 
-  REDIS.lpush('pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub(/\.html$/, '') })
+  if (Bucket.present? rescue false)
+    REDIS.lpush('pages', Bucket.objects.sort_by{ |o| o.last_modified }[-10, 10].map{ |o| o.key.sub(/\.html$/, '') })
+  end
 
   before do
     if request.path != '/' and request.path =~ %r[/$]
