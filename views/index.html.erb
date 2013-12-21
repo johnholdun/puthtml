@@ -15,8 +15,7 @@
       <li>
         <a href="<%= doc.path %>">
           <strong><%= doc.title %></strong>
-          <br />
-          <em><%= doc.user.try(:name) %></em>
+          <em><%= doc.user.try(:name) || doc.user_name %></em>
         </a>
       </li>
     <% end %>
