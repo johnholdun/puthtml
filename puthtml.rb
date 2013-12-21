@@ -154,7 +154,6 @@ class PutHTML < Sinatra::Base
     if @error
       flash[:error] = @error
       redirect to('/')
-    else
     end
   end
 end
