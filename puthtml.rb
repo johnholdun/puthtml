@@ -102,7 +102,7 @@ class PutHTML < Sinatra::Base
       return redirect to ("/#{ clean_path }")
     end
 
-    path += '.html' if File.extname(path) == ''
+    path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
     output = Bucket.objects[path].read rescue nil
     if output
       headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
