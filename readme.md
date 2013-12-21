@@ -13,6 +13,8 @@ Set up in your env:
 - TWITTER_CONSUMER_KEY
 - TWITTER_CONSUMER_SECRET
 
-run: rackup config.rb
+We're using `foreman` so that things match Heroku as closely as possible, thanks to it using the Procfile and a .env file with key/value pairs. You can start the app up via foreman using the following:
 
-Try it here: http://puthtml.herokuapp.com
+`bundle exec foreman start`
+
+If you're not feeling adventurous, try the prototype here: http://puthtml.com

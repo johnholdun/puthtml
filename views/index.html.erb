@@ -1,74 +1,24 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Put HTML</title>
-    <meta name='viewport' content='width=device-width'>
-    <style>
-      * { margin: 0; padding: 0; font-family: sans-serif; }
-      body { margin: 5em; }
-      h1, form, p { margin-bottom: 1em; }
-      p.error { color: #900; }
-      .sign-in { color: #fff; background: #209be9; text-decoration: none; display: inline-block; padding: 0.5em 1em; box-shadow: 0 1px 1px #ccc; }
-      button { visibility: hidden; }
-      h2 { margin: 2em 0 0.5em; font-size: 1em; }
-      #documents { list-style: none; }
-      #documents li { margin-bottom: 0.5em; }
-      #documents a { color: #009; text-decoration: none; display: normal; }
-      #documents strong { font-weight: normal; display: normal; }
-      #documents em { font-style: normal; font-size: 0.75em; display: normal; }
-      .who-mike-jones { margin: 6em 0 0; }
-      .who-mike-jones a { color: #ccc; text-decoration: none; }
-      .who-mike-jones a:hover { color: #99e; }
+<% if current_user %>
+  <form method="post" action="/" id="form_create" enctype="multipart/form-data">
+    <input type="file" name="file" id="file">
+    <button>Put HTML</button>
+  </form>
+<% else %>
+  <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
+<% end %>
 
-      @media (max-width: 640px) {
-        body {
-          margin: 1em;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Put HTML</h1>
+<% if @documents.size > 0 %>
+  <h2>Latest documents</h2>
 
-    <% if @error %>
-      <p class="error"><%= @error %></p>
+  <ul id="documents">
+    <% @documents.each do |doc| %>
+      <li>
+        <a href="<%= doc.path %>">
+          <strong><%= doc.title %></strong>
+          <br />
+          <em><%= doc.user.try(:name) %></em>
+        </a>
+      </li>
     <% end %>
-
-    <% if current_user %>
-      <form method="post" action="/" id="form_create" enctype="multipart/form-data">
-        <input type="file" name="file" id="file">
-        <button>Put HTML</button>
-      </form>
-    <% else %>
-      <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
-    <% end %>
-
-    <% if @documents.size > 0 %>
-      <h2>Latest documents</h2>
-
-      <ul id="documents">
-        <% @documents.each do |doc| %>
-          <li>
-            <a href="<%= doc.path %>" target="_blank">
-              <strong><%= doc.title %></strong>
-              <br />
-              <em><%= doc.user.try(:name) %></em>
-            </a>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
-
-    <p class="who-mike-jones">
-      <small><a href="http://twitter.com/johnholdun">@johnholdun</a></small>
-      <small><a href="http://twitter.com/negatendo">@negatendo</a></small>
-      <small><a href="http://twitter.com/ckolderup">@ckolderup</a></small>
-    </p>
-
-    <script>
-      document.getElementById("file").addEventListener("change", function() {
-        document.getElementById("form_create").submit()
-      })
-    </script>
-  </body>
-</html>
+  </ul>
+<% end %>
