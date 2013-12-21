@@ -17,4 +17,8 @@ We're using `foreman` so that things match Heroku as closely as possible, thanks
 
 `bundle exec foreman start`
 
+Before pushing to production (especially on Heroku) you'll either want to figure out how automatic asset compilation works or precompile your assets manually with this command:
+
+`RACK_ENV=production rake assets:precompile`
+
 If you're not feeling adventurous, try the prototype here: http://puthtml.com
