@@ -1,3 +1,4 @@
+<% @title = "#{ @user.name }#{ " (#{ @user.profile.name.strip_tags })" if @user.profile.has? :name }" %>
 <div id="user" class="unit">
   <h2>
     <%= @user.name %>
