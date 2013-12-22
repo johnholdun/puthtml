@@ -73,6 +73,8 @@ class PutHTML < Sinatra::Base
 
     documents.compact! # just for legacy
 
+    # start fresh
+    REDIS.del(['documents'] + REDIS.keys('documents.*'))
     REDIS.zadd 'documents', documents.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
     documents.group_by(&:user_id).each do |user_id, docs|
       next if docs.first.user.nil?
