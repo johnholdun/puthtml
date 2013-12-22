@@ -65,8 +65,6 @@ class PutHTML < Sinatra::Base
     Redis.new
   end
 
-  REDIS.ltrim('pages', -1, 0)
-
   if (Bucket.present? rescue false)
     documents = Bucket.objects.map do |obj|
       next if obj.key =~ /^_legacy\// # legacy duh
