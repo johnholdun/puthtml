@@ -105,7 +105,7 @@ class PutHTML < Sinatra::Base
     user = User.first_or_new({ uid: auth["uid"] }, { created_at: Time.now })
     user.name = auth["info"]["nickname"]
 
-    first_time = (user.new? or user.created_at.to_i < 1387668050) # legacy lol
+    first_time = (user.new? or (user.created_at.to_i < 1387668050 and !Bucket.objects["#{ user.name }/profile.json"].exists?)) # legacy lol
     user.save
 
     # let's start this user off right
