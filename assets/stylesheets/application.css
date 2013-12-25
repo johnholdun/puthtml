@@ -15,7 +15,16 @@ a.sign-in { color: #fff; background: #209be9; display: inline-block; padding: 0.
 .unit { float: left; padding: 0 2em 2em 0; max-width: 33.333%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 .unit > *:first-child { margin-top: 0; }
 
+summary:before { display: none; }
+
+#user li { list-style: none; }
+.name { margin-bottom: 0.25em; }
+.profile a, .api-key summary, .api-key button, a.sign-out { background: none; padding: 0; font-size: 0.75em; line-height: 1.333em; color: #999; box-shadow: none; cursor: pointer; outline: 0; display: inline-block; }
+.api-key summary + * { display: block; }
 a.sign-out { color: #999; font-size: 0.75em; line-height: 1.333em; }
+.api-key tt { font: 0.5em/2em monospace; }
+
+#form_create { border-top: 0.1em solid #ccc; padding-top: 0.9em; }
 
 form ul { list-style: none; }
 form li { margin-bottom: 1em; }

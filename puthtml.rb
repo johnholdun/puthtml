@@ -128,6 +128,9 @@ class PutHTML < Sinatra::Base
       Document.write "#{ user.name }/profile.json", profile.to_json
     end
 
+    user.generate_api_key
+    user.save if user.dirty?
+
     session[:user_id] = user.id
 
     # after successful sign-in or sign-out
@@ -172,7 +175,8 @@ class PutHTML < Sinatra::Base
   end
 
   post '/' do
-    if current_user.nil?
+    authenticated_user = params[:api_key].present? ? User.first(api_key: params[:api_key]) : current_user
+    if authenticated_user.nil?
       @error = 'You need to sign in first!'
     else
       if params[:file].is_a? Hash
@@ -193,7 +197,7 @@ class PutHTML < Sinatra::Base
             path.sub!(/#{ File.extname(filename) }$/, '')
             path.gsub!(/[^a-zA-Z0-9_\-\/]/, '')
 
-            path = "#{ current_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
+            path = "#{ authenticated_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
             Document.write path, open(tmpfile).read
 
@@ -214,5 +218,14 @@ class PutHTML < Sinatra::Base
       flash[:error] = @error
       redirect to('/')
     end
+  end
+
+  post '/settings/api-key' do
+    if current_user
+      current_user.generate_api_key true
+      current_user.save
+    end
+
+    redirect '/'
   end
 end

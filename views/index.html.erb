@@ -1,8 +1,22 @@
 <% if current_user %>
   <div id="user" class="unit">
-    <p class="status">
-      <a href="/<%= current_user.name %>" target="_blank"><%= current_user.name %></a>
-      <small><a class="sign-out" href="/sign-out">Sign out</a></small>
+    <ul class="status">
+      <li class="name"><%= current_user.name %></li>
+      <li class="profile">
+        <a href="/<%= current_user.name %>" target="_blank">
+          Visit your profile
+        </a>
+      </li>
+      <li class="api-key">
+        <details>
+          <summary>Show API key</summary>
+          <tt><%= current_user.api_key %></tt>
+          <form action="/settings/api-key" method="post">
+            <button>Reset API key</button>
+          </form>
+        </details>
+      </li>
+      <li class="sign-out"><a class="sign-out" href="/sign-out">Sign out</a></li>
     </p>
 
     <form method="post" action="/" id="form_create" enctype="multipart/form-data">

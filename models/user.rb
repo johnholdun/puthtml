@@ -4,6 +4,9 @@ class User
   property :uid,        String
   property :name,       String
   property :created_at, DateTime
+  property :api_key,    String
+
+  before :create, :generate_api_key
 
   def profile
     @profile ||= UserProfile.new
@@ -13,6 +16,11 @@ class User
     if profile_fields.is_a? Hash
       @profile = UserProfile.new(profile_fields)
     end
+  end
+
+  def generate_api_key force = false
+    return api_key if api_key.present? and !force
+    self.api_key = SecureRandom.hex 24
   end
 end
 
