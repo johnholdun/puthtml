@@ -106,7 +106,7 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
-    @documents = REDIS.zrevrange('documents', 0, 10).map{ |path| Document.new(path: path) }
+    @documents = REDIS.zrevrange('documents', 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
     erb :'index.html', layout: true
   end
 

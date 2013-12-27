@@ -47,14 +47,19 @@
 
     <ul id="documents">
       <% @documents.each do |doc| %>
-        <li>
-          <a href="<%= doc.path %>" target="_blank">
+        <li data-user="<%= doc.user_name %>">
+          <a class="title" href="<%= doc.path %>" target="_blank">
             <span class="meta">
               <em class="user"><%= doc.user.try(:name) || doc.user_name %></em>
               <% if doc.partial_path.present? %><small class="partial-path"><%= doc.partial_path.split('/').map{ |part| "<span>#{ part }</span>" }.join ' ' %></small><% end %>
             </span>
             <strong class="title"><%= doc.title %></strong>
           </a>
+
+          <aside>
+            <span class="time"><%= doc.updated_at.strftime('%b %-e %I:%-m%P') %></span>
+            <a class="edit" href="/<%= doc.path %>?edit"><%= (doc.user == current_user) ? 'Edit' : 'Copy' %></a>
+          </aside>
         </li>
       <% end %>
     </ul>
