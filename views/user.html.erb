@@ -19,18 +19,6 @@
       Latest documents by <%= @user.name %>
     </h3>
 
-    <ul id="documents">
-      <% @documents.each do |doc| %>
-        <li>
-          <a href="<%= doc.path %>" target="_blank">
-            <span class="meta">
-              <em class="user"><%= doc.user.try(:name) || doc.user_name %></em>
-              <% if doc.partial_path.present? %><small class="partial-path"><%= doc.partial_path.split('/').map{ |part| "<span>#{ part }</span>" }.join ' ' %></small><% end %>
-            </span>
-            <strong class="title"><%= doc.title %></strong>
-          </a>
-        </li>
-      <% end %>
-    </ul>
+    <%= erb :'documents.html' %>
   </div>
 <% end %>

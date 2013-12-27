@@ -158,7 +158,7 @@ class PutHTML < Sinatra::Base
     profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
     @user.profile = profile if profile
 
-    @documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10).map{ |path| Document.new(path: path) }
+    @documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
     unless @documents.nil?
       return erb :'user.html', layout: true
     end
