@@ -39,6 +39,8 @@ class PutHTML < Sinatra::Base
   AWS_SECRET_ACCESS_KEY = ENV['AWS_SECRET_ACCESS_KEY']
   Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']] rescue nil
 
+  MAX_FILE_SIZE = 1_048_576
+
   ACCEPTABLE_MIME_TYPES = %w[
     text/html
     application/json
@@ -53,6 +55,14 @@ class PutHTML < Sinatra::Base
     'text/css' => '.css',
     'application/javascript' => '.js',
     'application/yaml' => '.yml',
+  }
+
+  EDITOR_MODES = {
+    '.json' => 'json',
+    '.js' => 'javascript',
+    '.html' => 'html',
+    '.yml' => 'yaml',
+    '.css' => 'css'
   }
 
   use Rack::Flash
@@ -165,9 +175,19 @@ class PutHTML < Sinatra::Base
 
     path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
     output = Bucket.objects[path].read rescue nil
+
     if output
-      headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
-      return output
+      if current_user and params.key? 'edit'
+        doc = Document.new path: path
+        @copy = (doc.user != current_user)
+        @path = path
+        @output = output
+        @mode = EDITOR_MODES[File.extname(path)]
+        return erb :'editor.html', layout: true
+      else
+        headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
+        return output
+      end
     else
       flash[:error] = 'That page does not exist. Put it there!'
       redirect to('/')
@@ -179,27 +199,35 @@ class PutHTML < Sinatra::Base
     if authenticated_user.nil?
       @error = 'You need to sign in first!'
     else
+      contents = nil
+      path = nil
+
       if params[:file].is_a? Hash
         tmpfile = params[:file][:tempfile]
-        filename = params[:file][:filename]
+        # if this file is huge, don't read the whole thing--
+        # just enough to trigger the "too large" error
+        # (i'm not sure this actually gains us anything)
+        contents = open(tmpfile).read(MAX_FILE_SIZE + 1)
+        path = (params[:path] || params[:file][:filename])
+      elsif params[:contents]
+        contents = params[:contents]
+        path = params[:path]
       end
 
-      if tmpfile and filename
-        type = %x[file -b --mime-type #{ tmpfile.path }].strip
-        if type == 'text/plain'
-          type = Rack::Mime::MIME_TYPES[File.extname(filename).to_s]
-        end
+      extname = File.extname(path)
+      extname = '.html' if extname == ''
+      type = Rack::Mime::MIME_TYPES[extname]
 
+      if contents
         if ACCEPTABLE_MIME_TYPES.include? type.to_s
-          if tmpfile.size <= 1_048_576
-            path = filename
-            path = params[:path] if params[:path].to_s.strip.present?
-            path.sub!(/#{ File.extname(filename) }$/, '')
-            path.gsub!(/[^a-zA-Z0-9_\-\/]/, '')
+          if contents.size <= MAX_FILE_SIZE
+            path.sub! /#{ File.extname(path) }$/, ''
+            path.gsub! /[^a-zA-Z0-9_\-\/]/, ''
+            path.sub! %r[^#{ current_user.name }/]i, ''
 
             path = "#{ authenticated_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
-            Document.write path, open(tmpfile).read
+            Document.write path, contents
 
             redirect to("/#{ path }")
             return

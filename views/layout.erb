@@ -7,8 +7,14 @@
     <link rel="stylesheet" href="<%= stylesheet_path 'application' %>">
   </head>
   <body>
-    <h1 id="title"><a href="/">Put HTML</a></h1>
-    <p id="nut"><%= nut %></p>
+    <header>
+      <h1 id="title"><a href="/">Put HTML</a></h1>
+      <p id="nut"><%= nut %></p>
+    </header>
+
+    <% if @title %>
+      <h1><%= @title %></h1>
+    <% end %>
 
     <% if @error %>
       <p class="error"><%= @error %></p>

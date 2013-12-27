@@ -1,11 +1,8 @@
 <% @title = "#{ @user.name }#{ " (#{ @user.profile.name.strip_tags })" if @user.profile.has? :name }" %>
 <div id="user" class="unit">
-  <h2>
-    <%= @user.name %>
-    <% if @user.profile.has? :name %>
-      (<%= @user.profile.name.strip_tags %>)
-    <% end %>
-  </h2>
+  <% if @user.profile.has? :description %>
+    <p class="description"><%= @user.profile.description.strip_tags %></p>
+  <% end %>
 
   <% if @user.profile.has? :url %>
     <p class="url"><a href="<%= @user.profile.url %>" target="_blank"><%= @user.profile.url.strip_tags %></a></p>
@@ -13,10 +10,6 @@
 
   <% if @user.profile.has? :location %>
     <p class="location"><%= @user.profile.location.strip_tags %></p>
-  <% end %>
-
-  <% if @user.profile.has? :description %>
-    <p class="description"><%= @user.profile.description.strip_tags %></p>
   <% end %>
 </div>
 

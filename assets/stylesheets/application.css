@@ -52,6 +52,15 @@ h2, h3 { margin: 2em 0 0.5em; font-size: 1em; }
 .who-mike-jones a { color: #ccc; }
 .who-mike-jones a:hover { color: #99e; }
 
+#editor, #editor * { font-family: monospace; font-size: 1em; }
+#editor { width: 100%; min-height: 500px; margin-bottom: 1em; }
+
+#form_edit.with-ace-editor { overflow: hidden; margin: 1em 0 0.5em; }
+#form_edit.with-ace-editor .contents { display: none; }
+#form_edit.with-ace-editor ul { float: left; }
+#form_edit.with-ace-editor input[type='text'] { width: 30em; }
+#form_edit.with-ace-editor button { float: right; }
+
 @media (max-width: 640px) {
   body { margin: 1em; }
 
