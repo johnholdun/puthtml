@@ -26,7 +26,7 @@ class PutHTML < Sinatra::Base
     enable :sessions
   end
 
-  set :assets_precompile, %w[*.css]
+  set :assets_precompile, %w[*.css *.js]
   register Sinatra::AssetPipeline
 
   helpers do
