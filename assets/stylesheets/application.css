@@ -59,7 +59,7 @@ h2, h3 { margin: 2em 0 0.5em; font-size: 1em; }
 #form_edit.with-ace-editor .contents { display: none; }
 #form_edit.with-ace-editor ul { float: left; }
 #form_edit.with-ace-editor input[type='text'] { width: 30em; }
-#form_edit.with-ace-editor button { float: right; }
+#form_edit.with-ace-editor button { float: right; vertical-align: bottom; margin-top: 1em;}
 
 @media (max-width: 640px) {
   body { margin: 1em; }

@@ -177,13 +177,18 @@ class PutHTML < Sinatra::Base
     output = Bucket.objects[path].read rescue nil
 
     if output
-      if current_user and params.key? 'edit'
-        doc = Document.new path: path
-        @copy = (doc.user != current_user)
-        @path = path
-        @output = output
-        @mode = EDITOR_MODES[File.extname(path)]
-        return erb :'editor.html', layout: true
+      if params.key? 'edit'
+        if current_user
+          doc = Document.new path: path
+          @copy = (doc.user != current_user)
+          @path = path.sub %r[^[^/]+/], ''
+          @output = output
+          @mode = EDITOR_MODES[File.extname(path)]
+          return erb :'editor.html', layout: true
+        else
+          flash[:error] = 'You must be signed in to edit a document.'
+          redirect '/'
+        end
       else
         headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
         return output
