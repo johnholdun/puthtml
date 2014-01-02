@@ -275,8 +275,9 @@ h2, h3 {
 .who-mike-jones {
   float: none;
   clear: both;
-  border-top: 1px solid #ccc;
-  padding-top: 19px;
+  margin-top: 2em;
+  border-top: 0.05em solid #ccc;
+  padding-top: 1.95em;
   width: auto;
 }
 
