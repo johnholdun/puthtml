@@ -1,16 +1,26 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
 }
 
 body {
   margin: 5em;
   max-width: 50em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: rgb(30, 30, 35);
+  font-family: jaf-bernino-sans;
+  font-size: 20px;
+  line-height: 30px;
 }
 
 h1, p {
   margin-bottom: 1em;
+}
+
+h1 {
+  font-size: 1.5em;
+  line-height: 1.333em;
 }
 
 #title {
@@ -20,6 +30,7 @@ h1, p {
 }
 
 #title a {
+  font-size: inherit;
   color: inherit;
 }
 
@@ -217,10 +228,9 @@ h2, h3 {
   display: inline-block;
   font-style: normal;
   color: #333;
-  line-height: 1.5em;
   font-size: 0.75em;
-  line-height: 1.333em;
-  height: 1.333em;
+  line-height: 1.5em;
+  height: 1.5;
 }
 
 #documents .partial-path * {
@@ -255,7 +265,7 @@ h2, h3 {
   display: inline-block;
   margin-right: 0.5em;
   font-size: 0.75em;
-  line-height: 1.333em;
+  line-height: 1.5em;
 }
 
 #documents aside a {
