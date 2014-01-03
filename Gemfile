@@ -18,5 +18,4 @@ group :development do
   gem 'rerun'
   gem 'dm-sqlite-adapter'
   gem 'foreman'
-  gem 'dm-sqlite-adapter'
 end
