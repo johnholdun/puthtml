@@ -213,7 +213,7 @@ class PutHTML < Sinatra::Base
         # just enough to trigger the "too large" error
         # (i'm not sure this actually gains us anything)
         contents = open(tmpfile).read(MAX_FILE_SIZE + 1)
-        path = (params[:path] || params[:file][:filename])
+        path = params[:path].to_s.strip.present? ? params[:path].strip : params[:file][:filename]
       elsif params[:contents]
         contents = params[:contents]
         path = params[:path]
