@@ -181,6 +181,22 @@ button {
   cursor: pointer;
 }
 
+button.destructive {
+  background: #933;
+}
+
+button.link {
+  color: #009;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+button.link.destructive {
+  color: #933;
+  background: none;
+}
+
 h2, h3 {
   margin: 2em 0 0.5em;
   font-size: 1em;
@@ -268,7 +284,7 @@ h2, h3 {
   line-height: 1.5em;
 }
 
-#documents aside a {
+#documents aside a, #documents aside button.link:not(.destructive) {
   color: inherit;
 }
 

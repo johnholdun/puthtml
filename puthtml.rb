@@ -261,4 +261,37 @@ class PutHTML < Sinatra::Base
 
     redirect '/'
   end
+
+  post '/*' do
+    if params[:_method] == 'delete'
+      authenticated_user = params[:api_key].present? ? User.first(api_key: params[:api_key]) : current_user
+      if authenticated_user.nil?
+        @error = 'You need to sign in first!'
+      else
+        path = params[:splat].join('/')
+
+        clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+
+        if path != clean_path
+          return redirect to ("/#{ clean_path }")
+        end
+
+        path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
+
+        object = Bucket.objects[path]
+        if object.exists?
+          Document.delete path
+          # todo
+          # This shouldn't be displayed as an error
+          # but we don't have a success state yet
+          @error = 'Document deleted.'
+        else
+          @error = 'This document does not exist so it cannot be deleted.'
+        end
+      end
+
+      flash[:error] = @error
+      redirect to('/')
+    end
+  end
 end
