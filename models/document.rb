@@ -52,4 +52,11 @@ class Document
     ::PutHTML::REDIS.zadd 'documents', zadd_params
     ::PutHTML::REDIS.zadd "documents.#{ path.split('/').first }", zadd_params
   end
+
+  def self.delete path
+    ::PutHTML::Bucket.objects[path].delete
+    zrem_params = path.sub(/\.html$/, '')
+    ::PutHTML::REDIS.zrem 'documents', zrem_params
+    ::PutHTML::REDIS.zrem "documents.#{ path.split('/').first }", zrem_params
+  end
 end
