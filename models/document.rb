@@ -55,8 +55,8 @@ class Document
   end
 
   def view!
-    REDIS.zincrby 'views', 1, path
-    REDIS.zincrby "views.#{ user.name }", 1, path
+    ::PutHTML::REDIS.zincrby 'views', 1, path
+    ::PutHTML::REDIS.zincrby "views.#{ user.name }", 1, path
   end
 
   def self.write path, contents
