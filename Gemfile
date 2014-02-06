@@ -12,6 +12,7 @@ gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'sinatra-asset-pipeline'
 gem 'dm-postgres-adapter', group: :production
+gem 'dm-transactions'
 
 group :development do
   gem 'tux'

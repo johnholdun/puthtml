@@ -169,6 +169,7 @@ DEPENDENCIES
   data_mapper
   dm-postgres-adapter
   dm-sqlite-adapter
+  dm-transactions
   foreman
   omniauth
   omniauth-twitter

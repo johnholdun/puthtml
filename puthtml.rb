@@ -75,22 +75,22 @@ class PutHTML < Sinatra::Base
     Redis.new
   end
 
-  if (Bucket.present? rescue false)
-    documents = Bucket.objects.map do |obj|
-      next if obj.key =~ /^_legacy\// # legacy duh
-      Document.new path: obj.key, updated_at: obj.last_modified
-    end
+  # if (Bucket.present? rescue false)
+  #   documents = Bucket.objects.map do |obj|
+  #     next if obj.key =~ /^_legacy\// # legacy duh
+  #     Document.new path: obj.key, updated_at: obj.last_modified
+  #   end
 
-    documents.compact! # just for legacy
+  #   documents.compact! # just for legacy
 
-    # start fresh
-    REDIS.del(['documents'] + REDIS.keys('documents.*'))
-    REDIS.zadd 'documents', documents.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
-    documents.group_by(&:user_id).each do |user_id, docs|
-      next if docs.first.user.nil?
-      REDIS.zadd "documents.#{ docs.first.user.name }", docs.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
-    end
-  end
+  #   # start fresh
+  #   REDIS.del(['documents'] + REDIS.keys('documents.*'))
+  #   REDIS.zadd 'documents', documents.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
+  #   documents.group_by(&:user_id).each do |user_id, docs|
+  #     next if docs.first.user.nil?
+  #     REDIS.zadd "documents.#{ docs.first.user.name }", docs.map{ |doc| [doc.updated_at.to_i, doc.path] }.flatten
+  #   end
+  # end
 
   before do
     if ENV['RACK_ENV'] == 'production' and ENV.key?('APP_HOST') and request.host != ENV['APP_HOST']
@@ -106,8 +106,8 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
-    @latest_documents = REDIS.zrevrange('documents', 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
-    @greatest_documents = REDIS.zrevrange('views', 0, 10).map{ |path| Document.new(path: path) }
+    @latest_documents = Document.latest(limit: 25)
+    @greatest_documents = Document.greatest(limit: 25)
 
     erb :'index.html', layout: true
   end
@@ -160,8 +160,8 @@ class PutHTML < Sinatra::Base
     profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
     @user.profile = profile if profile
 
-    @latest_documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
-    @greatest_documents = REDIS.zrevrange("views.#{ @user.name }", 0, 10).map{ |path| Document.new(path: path) }
+    @latest_documents = Document.latest(limit: 25, user: @user)
+    @greatest_documents = Dcoument.greatest(limit: 25, user: @user)
 
     unless @latest_documents.nil?
       return erb :'user.html', layout: true
@@ -178,13 +178,13 @@ class PutHTML < Sinatra::Base
     end
 
     path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
-    output = Bucket.objects[path].read rescue nil
+    @document = Document.new path: path
+    output = Bucket.objects[@document.path].read rescue nil
 
     if output
       if params.key? 'edit'
         if current_user
-          doc = Document.new path: path
-          @copy = (doc.user != current_user)
+          @copy = (@document.user != current_user)
           @path = path.sub %r[^[^/]+/], ''
           @output = output
           @mode = EDITOR_MODES[File.extname(path)]
@@ -194,9 +194,7 @@ class PutHTML < Sinatra::Base
           redirect '/'
         end
       else
-        zincrby_param = path.sub(/\.html$/, '')
-        REDIS.zincrby 'views', 1, zincrby_param
-        REDIS.zincrby "views.#{ path.split('/').first }", 1, zincrby_param
+        @document.view!
 
         headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
         return output
