@@ -14,9 +14,13 @@ require 'sinatra/asset_pipeline'
 require_relative 'models/init'
 require_relative 'lib/sanitizers.rb'
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
-DataMapper.finalize
-DataMapper.auto_upgrade!
+begin
+  DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
+  DataMapper.finalize
+  DataMapper.auto_upgrade!
+rescue
+  # this fails on slug compilation which is ~okay~, just let it go
+end
 
 class PutHTML < Sinatra::Base
   use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
