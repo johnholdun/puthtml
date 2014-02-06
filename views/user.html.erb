@@ -13,12 +13,31 @@
   <% end %>
 </div>
 
-<% if @documents.size > 0 %>
+<%
+  # todo: dry this shit up
+%>
+<% if @latest_documents.size > 0 %>
   <div class="unit">
-    <h3>
-      Latest documents by <%= @user.name %>
-    </h3>
+    <h2>Latest documents by <%= @user.name %></h2>
 
+    <%
+      # we don't really have a partial system
+      # so we're passing vars into "partials" like this
+      # u nasty
+      @documents = @latest_documents
+    %>
+    <%= erb :'documents.html' %>
+  </div>
+<% end %>
+
+<% if @greatest_documents.size > 0 %>
+  <div class="unit">
+    <h2>Greatest documents by <%= @user.name %></h2>
+
+    <%
+      # u still nasty
+      @documents = @greatest_documents
+    %>
     <%= erb :'documents.html' %>
   </div>
 <% end %>

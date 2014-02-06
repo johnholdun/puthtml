@@ -41,10 +41,28 @@
   <p class="unit"><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
 <% end %>
 
-<% if @documents.size > 0 %>
+<% if @latest_documents.size > 0 %>
   <div class="unit">
     <h2>Latest documents</h2>
 
+    <%
+      # we don't really have a partial system
+      # so we're passing vars into "partials" like this
+      # u nasty
+      @documents = @latest_documents
+    %>
+    <%= erb :'documents.html' %>
+  </div>
+<% end %>
+
+<% if @greatest_documents.size > 0 %>
+  <div class="unit">
+    <h2>Greatest documents</h2>
+
+    <%
+      # u still nasty
+      @documents = @greatest_documents
+    %>
     <%= erb :'documents.html' %>
   </div>
 <% end %>

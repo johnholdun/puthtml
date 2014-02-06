@@ -106,7 +106,9 @@ class PutHTML < Sinatra::Base
 
   get '/' do
     @error = flash[:error]
-    @documents = REDIS.zrevrange('documents', 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
+    @latest_documents = REDIS.zrevrange('documents', 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
+    @greatest_documents = REDIS.zrevrange('views', 0, 10).map{ |path| Document.new(path: path) }
+
     erb :'index.html', layout: true
   end
 
@@ -158,8 +160,10 @@ class PutHTML < Sinatra::Base
     profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
     @user.profile = profile if profile
 
-    @documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
-    unless @documents.nil?
+    @latest_documents = REDIS.zrevrange("documents.#{ @user.name }", 0, 10, with_scores: true).map{ |path, time| Document.new(path: path, updated_at: Time.at(time)) }
+    @greatest_documents = REDIS.zrevrange("views.#{ @user.name }", 0, 10).map{ |path| Document.new(path: path) }
+
+    unless @latest_documents.nil?
       return erb :'user.html', layout: true
     end
   end
@@ -190,6 +194,10 @@ class PutHTML < Sinatra::Base
           redirect '/'
         end
       else
+        zincrby_param = path.sub(/\.html$/, '')
+        REDIS.zincrby 'views', 1, zincrby_param
+        REDIS.zincrby "views.#{ path.split('/').first }", 1, zincrby_param
+
         headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
         return output
       end
