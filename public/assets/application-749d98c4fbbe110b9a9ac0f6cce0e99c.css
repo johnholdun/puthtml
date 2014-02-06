@@ -271,8 +271,6 @@ h2, h3 {
   color: #009;
   line-height: 1em;
   height: 1em;
-  padding: 0.25em;
-  margin: -0.25em;
   text-overflow: ellipsis;
 }
 

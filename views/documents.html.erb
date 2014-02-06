@@ -13,6 +13,9 @@
         <% if doc.updated_at %>
           <span class="time"><%= doc.updated_at.strftime('%b %-e %-I:%m%P') %></span>
         <% end %>
+        <% if doc.views > 0 %>
+          <span class="views"><%= doc.views.with_delimiter %> <%= 'view'.pluralize doc.views %></span>
+        <% end %>
         <a class="edit" href="/<%= doc.path %>?edit"><%= (doc.user == current_user) ? 'Edit' : 'Copy' %></a>
         <% if current_user and doc.user == current_user %>
           <form action="/<%= doc.path %>" method="post" class="delete">

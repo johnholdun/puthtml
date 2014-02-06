@@ -12,7 +12,8 @@ Bundler.require
 require 'sinatra/asset_pipeline'
 
 require_relative 'models/init'
-require_relative 'lib/sanitizers.rb'
+
+Dir.glob('lib/*.rb').each{ |path| require_relative path }
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.db")
 DataMapper.finalize
