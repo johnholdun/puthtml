@@ -9,10 +9,15 @@
       </li>
       <li class="api-key">
         <details>
-          <summary>Show API key</summary>
-          <tt><%= current_user.api_key %></tt>
+          <summary>See your API key</summary>
+          <p>Put HTML from anywhere! Just send a multipart POST request to <tt>http://www.puthtml.com/</tt> with parameters for <tt>file</tt>, <tt>path</tt> (optional), and <tt>api_key</tt>, which should be set to this:</p>
+          <p class="key"><tt><%= current_user.api_key %></tt></p>
           <form action="/settings/api-key" method="post">
-            <button>Reset API key</button>
+            <p>
+              Stuff getting too weird?
+              <button class="link">Reset your API key</button>
+              and pray for the best.
+            </p>
           </form>
         </details>
       </li>
