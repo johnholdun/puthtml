@@ -179,7 +179,7 @@ class PutHTML < Sinatra::Base
 
     path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
     @document = Document.new path: path
-    output = Bucket.objects[@document.path].read rescue nil
+    output = Bucket.objects[path].read rescue nil
 
     if output
       if params.key? 'edit'
