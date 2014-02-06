@@ -161,7 +161,7 @@ class PutHTML < Sinatra::Base
     @user.profile = profile if profile
 
     @latest_documents = Document.latest(limit: 25, user: @user)
-    @greatest_documents = Dcoument.greatest(limit: 25, user: @user)
+    @greatest_documents = Document.greatest(limit: 25, user: @user)
 
     unless @latest_documents.nil?
       return erb :'user.html', layout: true
