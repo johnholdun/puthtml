@@ -235,7 +235,7 @@ class PutHTML < Sinatra::Base
           if contents.size <= MAX_FILE_SIZE
             path.sub! /#{ File.extname(path) }$/, ''
             path.gsub! /[^a-zA-Z0-9_\-\/]/, ''
-            path.sub! %r[^#{ current_user.name }/]i, ''
+            path.sub! %r[^#{ authenticated_user.name }/]i, ''
 
             path = "#{ authenticated_user.name.downcase }/#{ path }#{ EXTNAMES_BY_MIME_TYPE[type] }"
 
