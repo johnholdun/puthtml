@@ -46,6 +46,10 @@ class Document
     @partial_path
   end
 
+  def implied_user_name
+    @implied_user_name ||= path.sub(/^\//, '').split('/').first
+  end
+
   def filename
     @filename ||= "#{ slug }.#{ type }"
   end
@@ -56,7 +60,7 @@ class Document
 
   def view!
     ::PutHTML::REDIS.zincrby 'views', 1, path
-    ::PutHTML::REDIS.zincrby "views.#{ user.name }", 1, path
+    ::PutHTML::REDIS.zincrby "views.#{ user.try(:name) || implied_user_name }", 1, path
   end
 
   def self.write path, contents
