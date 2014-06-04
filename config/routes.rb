@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   resources :posts, except: :show
 
-  get ':user' => 'users#show', as: :user
+  get ':user_name' => 'users#show', as: :user
   get '*path' => 'posts#show' #, as: :post
 
   # The priority is based upon order of creation: first created -> highest priority.
