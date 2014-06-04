@@ -1,9 +1,4 @@
-require 'rubygems'
-require 'bundler'
+# This file is used by Rack-based servers to start the application.
 
-Bundler.require
-use Rack::Session::Cookie, secret: ENV['COOKIE_SECRET']
-use Rack::Logger
-
-require './puthtml'
-run PutHTML
+require ::File.expand_path('../config/environment',  __FILE__)
+run Rails.application
