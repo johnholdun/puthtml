@@ -1,14 +1,28 @@
-<% if @user.posts.size > 0 %>
-  <h2>Latest documents by <%= @user.name %></h2>
+<% @title = "#{ @user.name }#{ " (#{ strip_tags strip_tags @user.profile.name })" if @user.profile.has? :name }" %>
+<div id="user" class="unit">
+  <% if @user.profile.has? :description %>
+    <p class="description"><%= strip_tags @user.profile.description %></p>
+  <% end %>
 
-  <ul id="documents">
-    <% @user.posts.each do |doc| %>
-      <li>
-        <a href="<%= doc.path %>">
-          <strong><%= doc.title %></strong>
-          <em><%= doc.user.name %></em>
-        </a>
-      </li>
-    <% end %>
-  </ul>
+  <% if @user.profile.has? :url %>
+    <p class="url"><a href="<%= @user.profile.url %>" target="_blank"><%= strip_tags @user.profile.url %></a></p>
+  <% end %>
+
+  <% if @user.profile.has? :location %>
+    <p class="location"><%= strip_tags @user.profile.location %></p>
+  <% end %>
+</div>
+
+<% if @latest_documents.present? %>
+  <div class="unit">
+    <h2>Latest documents by <%= @user.name %></h2>
+    <%= render 'posts/list', posts: @latest_documents %>
+  </div>
+<% end %>
+
+<% if @greatest_documents.present? %>
+  <div class="unit">
+    <h2>Greatest documents by <%= @user.name %></h2>
+    <%= render 'posts/list', posts: @greatest_documents %>
+  </div>
 <% end %>

@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Puthtml</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+  <head>
+    <% nut = 'Upload something. There it is.' %>
+    <title>&#x261E; Put HTML<%= ": #{ @title || nut }" %></title>
+    <meta name='viewport' content='width=device-width'>
+    <link rel="stylesheet" href="<%= stylesheet_path 'fonts' %>">
+    <link rel="stylesheet" href="<%= stylesheet_path 'application' %>">
+  </head>
+  <body>
+    <header>
+      <h1 id="title"><a href="/">Put HTML</a></h1>
+      <p id="nut"><%= nut %></p>
+    </header>
 
-<%= yield %>
+    <% if @title %>
+      <h1><%= @title %></h1>
+    <% end %>
 
-</body>
+    <% if @error %>
+      <p class="error"><%= @error %></p>
+    <% end %>
+
+    <%= yield %>
+
+    <p class="who-mike-jones g unit">
+      <small><a href="http://twitter.com/johnholdun">@johnholdun</a></small>
+      <small><a href="http://twitter.com/negatendo">@negatendo</a></small>
+      <small><a href="http://twitter.com/ckolderup">@ckolderup</a></small>
+    </p>
+  </body>
 </html>

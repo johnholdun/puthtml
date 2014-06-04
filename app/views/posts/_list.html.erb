@@ -1,0 +1,29 @@
+<ul id="documents">
+  <% posts.each do |doc| %>
+    <li data-user="<%= doc.user.name %>">
+      <a class="title" href="<%= doc.path %>" target="_blank">
+        <span class="meta">
+          <em class="user"><%= doc.user.name %></em>
+          <% if doc.partial_path.present? %><small class="partial-path"><%= doc.partial_path.split('/').map{ |part| "<span>#{ part }</span>" }.join ' ' %></small><% end %>
+        </span>
+        <strong class="title"><%= doc.title %></strong>
+      </a>
+
+      <aside>
+        <% if doc.updated_at %>
+          <span class="time"><%= doc.updated_at.strftime('%b %-e %-I:%m%P') %></span>
+        <% end %>
+        <% if doc.views > 0 %>
+          <span class="views"><%= doc.views.with_delimiter %> <%= 'view'.pluralize doc.views %></span>
+        <% end %>
+        <a class="edit" href="/<%= doc.path %>?edit"><%= (doc.user == current_user) ? 'Edit' : 'Copy' %></a>
+        <% if current_user and doc.user == current_user %>
+          <form action="/<%= doc.path %>" method="post" class="delete">
+            <input type="hidden" name="_method" value="delete">
+            <button class="destructive link">Delete</button>
+          </form>
+        <% end %>
+      </aside>
+    </li>
+  <% end %>
+</ul>

@@ -1,23 +1,61 @@
 <% if current_user %>
-  <form method="post" action="/" id="form_create" enctype="multipart/form-data">
-    <input type="file" name="file" id="file">
-    <button>Put HTML</button>
-  </form>
-<% else %>
-  <p><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
-<% end %>
-
-<% if @documents.size > 0 %>
-  <h2>Latest documents</h2>
-
-  <ul id="documents">
-    <% @documents.each do |doc| %>
-      <li>
-        <a href="<%= doc.path %>">
-          <strong><%= doc.title %></strong>
-          <em><%= doc.user.try(:name) %></em>
+  <div id="user" class="unit">
+    <ul class="status">
+      <li class="name"><%= current_user.name %></li>
+      <li class="profile">
+        <a href="/<%= current_user.name %>" target="_blank">
+          Visit your profile
         </a>
       </li>
-    <% end %>
-  </ul>
+      <li class="api-key">
+        <details>
+          <summary>See your API key</summary>
+          <p>Put HTML from anywhere! Just send a multipart POST request to <tt>http://www.puthtml.com/</tt> with parameters for <tt>file</tt>, <tt>path</tt> (optional), and <tt>api_key</tt>, which should be set to this:</p>
+          <p class="key"><tt><%= current_user.api_key %></tt></p>
+          <form action="/settings/api-key" method="post">
+            <p>
+              Stuff getting too weird?
+              <button class="link">Reset your API key</button>
+              and pray for the best.
+            </p>
+          </form>
+        </details>
+      </li>
+      <li class="sign-out"><a class="sign-out" href="/sign-out">Sign out</a></li>
+    </p>
+
+    <form method="post" action="/" id="form_create" enctype="multipart/form-data">
+      <ul>
+        <li>
+          <label for="file">File</label>
+          <input type="file" name="file" id="file">
+        </li>
+        <li>
+          <label for="path">Path (leave blank for auto)</label>
+          <div class="input-with-extra">
+            <span>/<%= current_user.name %>/</span>
+            <input type="text" name="path" id="path">
+          </div>
+        </li>
+      </ul>
+
+      <button>Put HTML</button>
+    </form>
+  </div>
+<% else %>
+  <p class="unit"><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
+<% end %>
+
+<% if @latest_documents.size > 0 %>
+  <div class="unit">
+    <h2>Latest documents</h2>
+    <%= render 'posts/list', posts: @latest_documents %>
+  </div>
+<% end %>
+
+<% if @greatest_documents.size > 0 %>
+  <div class="unit">
+    <h2>Greatest documents</h2>
+    <%= render 'posts/list', posts: @greatest_documents %>
+  </div>
 <% end %>
