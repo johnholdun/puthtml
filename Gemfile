@@ -40,3 +40,7 @@ gem 'foreman'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+gem 'aws-sdk'
+gem 'redis'
+gem 'omniauth'
+gem 'omniauth-twitter'
