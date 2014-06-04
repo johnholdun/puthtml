@@ -16,7 +16,7 @@ class Post < ActiveRecord::Base
     'application/javascript' => '.js',
     'application/yaml' => '.yml',
   }
-  
+
   belongs_to :user
 
   validates :contents, presence: true
@@ -25,7 +25,7 @@ class Post < ActiveRecord::Base
   before_save :fix_pathname
 
   def contents
-   @contents ||= #s3 voodoo
+   @contents ||= '' #s3 voodoo
   end
 
   def title
@@ -53,7 +53,6 @@ class Post < ActiveRecord::Base
   end
 
   def acceptable_mime_type
-
     unless ACCEPTABLE_MIME_TYPES.include? content_type.to_s then
       errors.add 'Your file is not an acceptable type!'
     end
