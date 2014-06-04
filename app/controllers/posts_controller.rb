@@ -7,8 +7,6 @@ class PostsController < ApplicationController
     render text: @post.contents, content_type: @post.content_type
   end
 
-  end
-
   def create
     @post = current_user.posts.new post_params
 
@@ -39,6 +37,7 @@ class PostsController < ApplicationController
   end
 
   private
+
   def post_params
     params.require(:post).permit(:file, :contents, :path, :apikey)
   end
