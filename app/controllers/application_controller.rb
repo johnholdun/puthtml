@@ -12,4 +12,9 @@ class ApplicationController < ActionController::Base
   rescue ActiveRecord::RecordNotFound
     redirect_to root_url, :flash => { error: "Resource not found." }
   end
+
+  def current_user
+    @current_user ||= User.first
+  end
+  helper_method :current_user
 end
