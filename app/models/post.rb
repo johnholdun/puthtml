@@ -17,19 +17,23 @@ class Post < ActiveRecord::Base
     'application/yaml' => '.yml',
   }
 
+  Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']] rescue nil
+
   belongs_to :user
 
   validates :contents, presence: true
   validate :acceptable_mime_type
   validate :file_small_enough
-  before_save :fix_pathname
+  # before_save :fix_pathname
+
+  attr_writer :contents
 
   def contents
-   @contents ||= '' #s3 voodoo
+    @contents ||= Bucket.objects[path].read rescue nil
   end
 
   def title
-   @title ||= @path.split('/').last
+    @title ||= path.split('/').last
   end
 
   def fix_pathname
