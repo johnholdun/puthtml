@@ -1,4 +1,22 @@
 class Post < ActiveRecord::Base
+  MAX_FILE_SIZE = 1_048_576
+
+  ACCEPTABLE_MIME_TYPES = %w[
+    text/html
+    application/json
+    text/css
+    application/javascript
+    application/yaml
+  ]
+
+  EXTNAMES_BY_MIME_TYPE = {
+    'text/html' => '.html',
+    'application/json' => '.json',
+    'text/css' => '.css',
+    'application/javascript' => '.js',
+    'application/yaml' => '.yml',
+  }
+  
   belongs_to :user
 
   validates :contents, presence: true
@@ -40,22 +58,4 @@ class Post < ActiveRecord::Base
       errors.add 'Your file is not an acceptable type!'
     end
   end
-
-  MAX_FILE_SIZE = 1_048_576
-
-  ACCEPTABLE_MIME_TYPES = %w[
-    text/html
-    application/json
-    text/css
-    application/javascript
-    application/yaml
-  ]
-
-  EXTNAMES_BY_MIME_TYPE = {
-    'text/html' => '.html',
-    'application/json' => '.json',
-    'text/css' => '.css',
-    'application/javascript' => '.js',
-    'application/yaml' => '.yml',
-  }
 end
