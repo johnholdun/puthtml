@@ -32,6 +32,16 @@ class Post < ActiveRecord::Base
     @contents ||= Bucket.objects[path].read rescue nil
   end
 
+  def parsed_contents
+    @parsed_contents ||= if content_type == 'application/json'
+      JSON.load(contents) rescue contents
+    # elsif content_type == 'application/yaml'
+    #   Yaml.load contents
+    else
+      contents
+    end
+  end
+
   def title
     @title ||= path.split('/').last
   end
@@ -48,6 +58,14 @@ class Post < ActiveRecord::Base
     extname = File.extname(path)
     extname = '.html' if extname == ''
     Rack::Mime::MIME_TYPES[extname]
+  end
+
+  def partial_path
+    @partial_path ||= path.split('/')[1 .. -2].join('/') rescue ''
+  end
+
+  def views
+    @views ||= self[:views].to_i
   end
 
   def file_small_enough
