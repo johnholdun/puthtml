@@ -2,7 +2,8 @@ class PostsController < ApplicationController
   before_filter :extract_file_info, only: [:create, :update]
 
   def show
-    @post = Posts.find(path: params[:path])
+    path = "#{ params[:path] }.#{ params[:format] || 'html' }"
+    @post = Post.find_by_path path
 
     render text: @post.contents, content_type: @post.content_type
   end
