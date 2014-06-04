@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
   root 'welcome#index'
 
-  resources :posts, except: [:get, :patch]
+  resources :posts, except: :show
 
   get ':user' => 'users#show', as: :user
-  get '*path' => 'posts#show', as: :post
+  get '*path' => 'posts#show' #, as: :post
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
