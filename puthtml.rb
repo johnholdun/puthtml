@@ -110,6 +110,9 @@ class PutHTML < Sinatra::Base
     @latest_documents = Document.latest(limit: 25)
     @greatest_documents = Document.greatest(limit: 25)
 
+    # no slurping from homepage
+    headers['X-Frame-Options'] = 'DENY'
+
     erb :'index.html', layout: true
   end
 
