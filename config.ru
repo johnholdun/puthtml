@@ -1,9 +1,12 @@
 require 'rubygems'
 require 'bundler'
+require 'rack/csrf'
 
 Bundler.require
 use Rack::Session::Cookie, secret: ENV['COOKIE_SECRET']
 use Rack::Logger
+
+use Rack::Csrf, :raise => true, :check_only => ['POST:/']
 
 if ENV['RACK_ENV'] == 'production'
   use Rack::Subdomain, 'puthtml.com', except: ['','www'], to: '/i.puthtml.com'

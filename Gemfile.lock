@@ -1,15 +1,15 @@
 PATH
+  remote: lib/rack-csrf
+  specs:
+    rack_csrf (2.5.0)
+      rack (>= 1.1.0)
+
+PATH
   remote: lib/rack-subdomain
   specs:
     rack-subdomain (0.3.1)
       ipaddress (~> 0.8.0)
       rack (>= 1.2.0, <= 2.0.0)
-
-PATH
-  remote: lib/rack_csrf
-  specs:
-    rack_csrf (2.5.0)
-      rack (>= 1.1.0)
 
 GEM
   remote: https://rubygems.org/
