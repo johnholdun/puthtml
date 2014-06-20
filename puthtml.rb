@@ -68,6 +68,9 @@ class PutHTML < Sinatra::Base
 
   use Rack::Flash
 
+  # www = we, i = me
+  use Rack::Subdomain, "i.puthtml.com", to: "/:username"
+
   REDIS_URL = ENV['REDISCLOUD_URL']
   REDIS = if REDIS_URL
     uri = URI.parse(REDIS_URL)
