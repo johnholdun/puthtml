@@ -158,20 +158,6 @@ class PutHTML < Sinatra::Base
     redirect '/'
   end
 
-  get '/:username' do
-    @user = User.first_or_new(name: params[:username])
-    profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
-    profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
-    @user.profile = profile if profile
-
-    @latest_documents = Document.latest(limit: 25, user: @user)
-    @greatest_documents = Document.greatest(limit: 25, user: @user)
-
-    unless @latest_documents.nil?
-      return erb :'user.html', layout: true
-    end
-  end
-
   ### i.puthtml.com content host
   get '/i.puthtml.com/*' do
     path = params[:splat].join('/')
@@ -197,7 +183,29 @@ class PutHTML < Sinatra::Base
     end 
   end
 
+  get '/:username/*' do
+    # content was once served from here before being moved to a seperate host
+    # this will redirect
+    if !params[:splat].empty?
+      return redirect PUTHTML_CONTENT_URL + "#{ params[:username] }/#{ params[:splat].join('/') }"
+    end
+
+    @user = User.first_or_new(name: params[:username])
+    profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
+    profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
+    @user.profile = profile if profile
+
+    @latest_documents = Document.latest(limit: 25, user: @user)
+    @greatest_documents = Document.greatest(limit: 25, user: @user)
+
+    unless @latest_documents.nil?
+      return erb :'user.html', layout: true
+    end
+  end
+
+
   get '/*' do
+    
   end
 
   #TODO get me working again
