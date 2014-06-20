@@ -172,7 +172,36 @@ class PutHTML < Sinatra::Base
     end
   end
 
+  ### i.puthtml.com content host
+  get '/i.puthtml.com/*' do
+    path = params[:splat].join('/')
+
+    clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+
+    if path != clean_path
+      return redirect to ("/#{ clean_path }")
+    end
+
+    path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
+    @document = Document.new path: path
+    output = Bucket.objects[path].read rescue nil
+
+    if output
+      @document.view!
+
+      headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
+      return output
+    else
+      flash[:error] = 'That page does not exist. Put it there!'
+      redirect to(PUTHTML_APP_URL)
+    end 
+  end
+
   get '/*' do
+  end
+
+  #TODO get me working again
+  get '/edit/*' do
     path = params[:splat].join('/')
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
