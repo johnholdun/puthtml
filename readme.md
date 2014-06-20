@@ -19,8 +19,8 @@ We're using `foreman` so that things match Heroku as closely as possible, thanks
 
 To get the www.puthtml.dev and i.puthtml.com subdomains working use [pow](http://pow.cx/)
 
-`echo 5000 ~/.pow/www.puthtml
-echo 5000 ~/.pow/i.puthtml`
+`echo 5000 ~/.pow/www.puthtml`
+`echo 5000 ~/.pow/i.puthtml`
 
 Before pushing to production (especially on Heroku) you'll either want to figure out how automatic asset compilation works or precompile your assets manually with this command:
 
