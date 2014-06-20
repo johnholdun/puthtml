@@ -153,7 +153,7 @@ class PutHTML < Sinatra::Base
     redirect '/'
   end
 
-  #TODO get me working again
+  #edit htmls or whatever else
   get '/edit-put/*' do
     path = params[:splat].join('/')
 
