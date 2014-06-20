@@ -1,7 +1,7 @@
 <ul id="documents">
   <% @documents.each do |doc| %>
     <li data-user="<%= doc.user_name %>">
-      <a class="title" href="<%= doc.path %>" target="_blank">
+      <a class="title" href="<%= PUTHTML_CONTENT_URL + doc.path %>" target="_blank">
         <span class="meta">
           <em class="user"><%= doc.user.try(:name) || doc.user_name %></em>
           <% if doc.partial_path.present? %><small class="partial-path"><%= doc.partial_path.split('/').map{ |part| "<span>#{ part }</span>" }.join ' ' %></small><% end %>
