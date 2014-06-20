@@ -16,7 +16,7 @@
         <% if doc.views > 0 %>
           <span class="views"><%= doc.views.with_delimiter %> <%= 'view'.pluralize doc.views %></span>
         <% end %>
-        <a class="edit" href="/<%= doc.path %>?edit"><%= (doc.user == current_user) ? 'Edit' : 'Copy' %></a>
+        <a class="edit" href="/edit-put/<%= doc.path %>"><%= (doc.user == current_user) ? 'Edit' : 'Copy' %></a>
         <% if current_user and doc.user == current_user %>
           <form action="/<%= doc.path %>" method="post" class="delete">
             <input type="hidden" name="_method" value="delete">

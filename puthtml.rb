@@ -154,8 +154,7 @@ class PutHTML < Sinatra::Base
   end
 
   #TODO get me working again
-  get '/edit/*' do
-    return 404
+  get '/edit-put/*' do
     path = params[:splat].join('/')
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
@@ -169,22 +168,15 @@ class PutHTML < Sinatra::Base
     output = Bucket.objects[path].read rescue nil
 
     if output
-      if params.key? 'edit'
-        if current_user
-          @copy = (@document.user != current_user)
-          @path = path.sub %r[^[^/]+/], ''
-          @output = output
-          @mode = EDITOR_MODES[File.extname(path)]
-          return erb :'editor.html', layout: true
-        else
-          flash[:error] = 'You must be signed in to edit a document.'
-          redirect '/'
-        end
+      if current_user
+        @copy = (@document.user != current_user)
+        @path = path.sub %r[^[^/]+/], ''
+        @output = output
+        @mode = EDITOR_MODES[File.extname(path)]
+        return erb :'editor.html', layout: true
       else
-        @document.view!
-
-        headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
-        return output
+        flash[:error] = 'You must be signed in to edit a document.'
+        redirect '/'
       end
     else
       flash[:error] = 'That page does not exist. Put it there!'
@@ -201,6 +193,11 @@ class PutHTML < Sinatra::Base
   ### i.puthtml.com content host
   get '/i.puthtml.com/*' do
     path = params[:splat].join('/')
+
+    #redirect to new edit url if old ?edit query exists
+    if params.key? 'edit'
+      return redirect PUTHTML_APP_URL + "edit-put/#{ path }"
+    end
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
 
