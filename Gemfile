@@ -15,6 +15,8 @@ gem 'dm-postgres-adapter', group: :production
 gem 'dm-transactions'
 gem 'actionpack'
 
+gem 'rack_csrf', :path => File.expand_path('../lib/rack_csrf/', __FILE__)
+
 group :development do
   gem 'tux'
   gem 'rerun'
