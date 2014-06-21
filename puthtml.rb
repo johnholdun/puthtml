@@ -197,7 +197,7 @@ class PutHTML < Sinatra::Base
 
     #redirect to new edit url if old ?edit query exists
     if params.key? 'edit'
-      return redirect to "/edit-put/#{ path }"
+      return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/edit-put/#{ path }"
     end
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
