@@ -6,7 +6,9 @@ Bundler.require
 use Rack::Session::Cookie, secret: ENV['COOKIE_SECRET']
 use Rack::Logger
 
-use Rack::Csrf, :raise => true, :check_only => ['POST:/']
+use Rack::Csrf, :raise => true, :check_only => ['POST:/'], :skip_if => lambda { |request|
+  request.params.key? 'api_key'
+}
 
 if ENV['RACK_ENV'] == 'production'
   use Rack::Subdomain, 'puthtml.com', except: ['','www'], to: '/i.puthtml'
