@@ -216,8 +216,8 @@ class PutHTML < Sinatra::Base
       headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
       return output
     else
-      flash[:error] = 'That page does not exist. Put it there!'
-      redirect to('/')
+      #redirect to homepage if nothing found? (should this 404?)
+      return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/"
     end 
   end
     
