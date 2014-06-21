@@ -94,8 +94,9 @@ class PutHTML < Sinatra::Base
   # end
 
   before do
-    if ENV['RACK_ENV'] == 'production' and ENV.key?('APP_HOST') and request.host != ENV['APP_HOST']
-      redirect "#{ request.scheme }://#{ ENV['APP_HOST'] }#{ request.path }"
+    #force app host if not content host
+    if request.host != PUTHTML_APP_HOST and request.host != PUTHTML_CONTENT_HOST
+      redirect "#{ request.scheme }://#{ PUTHTML_APP_HOST }#{ request.path }"
       return
     end
 
@@ -191,12 +192,12 @@ class PutHTML < Sinatra::Base
   end
 
   ### i.puthtml.com content host
-  get '/i.puthtml.com/*' do
+  get '/i.puthtml/*' do
     path = params[:splat].join('/')
 
     #redirect to new edit url if old ?edit query exists
     if params.key? 'edit'
-      return redirect PUTHTML_APP_URL + "edit-put/#{ path }"
+      return redirect to "/edit-put/#{ path }"
     end
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
@@ -216,7 +217,7 @@ class PutHTML < Sinatra::Base
       return output
     else
       flash[:error] = 'That page does not exist. Put it there!'
-      redirect to(PUTHTML_APP_URL)
+      redirect to('/')
     end 
   end
     
@@ -236,9 +237,9 @@ class PutHTML < Sinatra::Base
    
   get '/:username/*' do
     # content was once served from here before being moved to a seperate host
-    # this will redirect
+    # this will redirect old urls
     if !params[:splat].empty?
-      return redirect PUTHTML_CONTENT_URL + "#{ params[:username] }/#{ params[:splat].join('/') }"
+      return redirect PUTHTML_CONTENT_URL + "#{ params[:username] }/#{ params[:splat].join('/') }", 301
     end
   end
   
