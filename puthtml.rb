@@ -184,7 +184,6 @@ class PutHTML < Sinatra::Base
       redirect to('/')
     end
   end
-   
 
   get '/sign-out' do
     session.delete(:user_id)
@@ -234,7 +233,7 @@ class PutHTML < Sinatra::Base
       return erb :'user.html', layout: true
     end
   end
-   
+
   get '/:username/*' do
     # content was once served from here before being moved to a seperate host
     # this will redirect old urls
@@ -312,25 +311,31 @@ class PutHTML < Sinatra::Base
       if authenticated_user.nil?
         @error = 'You need to sign in first!'
       else
-        path = params[:splat].join('/')
+        path = params[:splat].to_a.flatten.join('/').split('/')
 
-        clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+        if path.first.downcase == current_user.name.downcase
+          path = path.join('/')
 
-        if path != clean_path
-          return redirect to ("/#{ clean_path }")
-        end
+          clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
 
-        path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
+          if path != clean_path
+            return redirect to ("/#{ clean_path }")
+          end
 
-        object = Bucket.objects[path]
-        if object.exists?
-          Document.delete path
-          # todo
-          # This shouldn't be displayed as an error
-          # but we don't have a success state yet
-          @error = 'Document deleted.'
+          path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
+
+          object = Bucket.objects[path]
+          if object.exists?
+            Document.delete path
+            # todo
+            # This shouldn't be displayed as an error
+            # but we don't have a success state yet
+            @error = 'Document deleted.'
+          else
+            @error = 'This document does not exist so it cannot be deleted.'
+          end
         else
-          @error = 'This document does not exist so it cannot be deleted.'
+          @error = 'This is not yours to delete!'
         end
       end
 

@@ -72,9 +72,15 @@ class Document
 
   def self.delete path
     ::PutHTML::Bucket.objects[path].delete
+
+    username = path.split('/').first
     zrem_params = path.sub(/\.html$/, '')
+
     ::PutHTML::REDIS.zrem 'times', zrem_params
-    ::PutHTML::REDIS.zrem "times.#{ path.split('/').first }", zrem_params
+    ::PutHTML::REDIS.zrem "times.#{ username }", zrem_params
+
+    ::PutHTML::REDIS.zrem 'views', zrem_params
+    ::PutHTML::REDIS.zrem "views.#{ username }", zrem_params
   end
 
   def self.collection key, params = {}
