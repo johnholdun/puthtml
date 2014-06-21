@@ -38,7 +38,7 @@
           </div>
         </li>
       </ul>
-
+      <%= Rack::Csrf.tag(env) %>
       <button>Put HTML</button>
     </form>
   </div>

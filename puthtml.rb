@@ -94,8 +94,9 @@ class PutHTML < Sinatra::Base
   # end
 
   before do
-    if ENV['RACK_ENV'] == 'production' and ENV.key?('APP_HOST') and request.host != ENV['APP_HOST']
-      redirect "#{ request.scheme }://#{ ENV['APP_HOST'] }#{ request.path }"
+    #force app host if not content host
+    if request.host != PUTHTML_APP_HOST and request.host != PUTHTML_CONTENT_HOST
+      redirect "#{ request.scheme }://#{ PUTHTML_APP_HOST }#{ request.path }"
       return
     end
 
@@ -153,26 +154,8 @@ class PutHTML < Sinatra::Base
     redirect '/'
   end
 
-  get '/sign-out' do
-    session.delete(:user_id)
-    redirect '/'
-  end
-
-  get '/:username' do
-    @user = User.first_or_new(name: params[:username])
-    profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
-    profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
-    @user.profile = profile if profile
-
-    @latest_documents = Document.latest(limit: 25, user: @user)
-    @greatest_documents = Document.greatest(limit: 25, user: @user)
-
-    unless @latest_documents.nil?
-      return erb :'user.html', layout: true
-    end
-  end
-
-  get '/*' do
+  #edit htmls or whatever else
+  get '/edit-put/*' do
     path = params[:splat].join('/')
 
     clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
@@ -186,29 +169,80 @@ class PutHTML < Sinatra::Base
     output = Bucket.objects[path].read rescue nil
 
     if output
-      if params.key? 'edit'
-        if current_user
-          @copy = (@document.user != current_user)
-          @path = path.sub %r[^[^/]+/], ''
-          @output = output
-          @mode = EDITOR_MODES[File.extname(path)]
-          return erb :'editor.html', layout: true
-        else
-          flash[:error] = 'You must be signed in to edit a document.'
-          redirect '/'
-        end
+      if current_user
+        @copy = (@document.user != current_user)
+        @path = path.sub %r[^[^/]+/], ''
+        @output = output
+        @mode = EDITOR_MODES[File.extname(path)]
+        return erb :'editor.html', layout: true
       else
-        @document.view!
-
-        headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
-        return output
+        flash[:error] = 'You must be signed in to edit a document.'
+        redirect '/'
       end
     else
       flash[:error] = 'That page does not exist. Put it there!'
       redirect to('/')
     end
   end
+   
 
+  get '/sign-out' do
+    session.delete(:user_id)
+    redirect '/'
+  end
+
+  ### i.puthtml.com content host
+  get '/i.puthtml/*' do
+    path = params[:splat].join('/')
+
+    #redirect to new edit url if old ?edit query exists
+    if params.key? 'edit'
+      return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/edit-put/#{ path }"
+    end
+
+    clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+
+    if path != clean_path
+      return redirect to ("/#{ clean_path }")
+    end
+
+    path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
+    @document = Document.new path: path
+    output = Bucket.objects[path].read rescue nil
+
+    if output
+      @document.view!
+
+      headers['Content-Type'] = Rack::Mime::MIME_TYPES[File.extname(path)]
+      return output
+    else
+      #redirect to homepage if nothing found? (should this 404?)
+      return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/"
+    end 
+  end
+    
+  get '/:username' do
+    @user = User.first_or_new(name: params[:username])
+    profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
+    profile ||= YAML.load(Bucket.objects["#{ @user.name }/profile.yml"].read) rescue nil
+    @user.profile = profile if profile
+
+    @latest_documents = Document.latest(limit: 25, user: @user)
+    @greatest_documents = Document.greatest(limit: 25, user: @user)
+
+    unless @latest_documents.nil?
+      return erb :'user.html', layout: true
+    end
+  end
+   
+  get '/:username/*' do
+    # content was once served from here before being moved to a seperate host
+    # this will redirect old urls
+    if !params[:splat].empty?
+      return redirect PUTHTML_CONTENT_URL + "#{ params[:username] }/#{ params[:splat].join('/') }", 301
+    end
+  end
+  
   post '/' do
     authenticated_user = params[:api_key].present? ? User.first(api_key: params[:api_key]) : current_user
     if authenticated_user.nil?

@@ -1,0 +1,11 @@
+= How to use Rack::Csrf with Sinatra
+
+This is a mini Sinatra application with two slightly different rackup files.
+Beside Rack you only need Sinatra to try them, so, assuming you have Bundler
+installed, run:
+
+    $ bundle install
+    $ bundle exec rackup -p 3000 config.ru
+    $ bundle exec rackup -p 3000 config-with-raise.ru
+
+Tested with Sinatra versions listed in the Gemfile.
