@@ -10,11 +10,28 @@ class ApplicationController < ActionController::Base
   def catch_not_found
     yield
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_url, :flash => { error: "Resource not found." }
+    redirect_to root_url, flash: { error: 'Resource not found.' }
   end
 
   def current_user
     @current_user ||= User.first
   end
   helper_method :current_user
+
+  def require_content_host
+    if request.host != CONTENT_HOST
+      redirect_to "#{ request.scheme }://#{ CONTENT_HOST }#{ request.path }", status: 301
+      return
+    end
+  end
+  helper_method :require_content_host
+
+
+  def require_app_host
+    if request.host != APP_HOST
+      redirect_to "#{ request.scheme }://#{ APP_HOST }#{ request.path }"
+      return
+    end
+  end
+  helper_method :require_content_host
 end

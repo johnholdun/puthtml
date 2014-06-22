@@ -1,9 +1,12 @@
 class PostsController < ApplicationController
+  before_filter :require_app_host, only: %w[edit destroy]
+  before_filter :require_content_host, only: :show
   before_filter :extract_file_info, only: [:create, :update]
 
   def show
     path = "#{ params[:path] }.#{ params[:format] || 'html' }"
     @post = Post.find_by_path path
+    raise ActiveRecord::RecordNotFound unless @post
 
     render text: @post.contents, content_type: @post.content_type
   end
@@ -17,6 +20,16 @@ class PostsController < ApplicationController
       render :new
     end
   end
+
+  def edit
+    path = "#{ params[:path] }.#{ params[:format] || 'html' }"
+    @post = Post.find_by_path path
+    raise ActiveRecord::RecordNotFound unless @post
+
+    @copy = !(@post.user == current_user)
+    render :'edit.html'
+  end
+
 
   def update
     @post = current_user.posts.find(params[:id])

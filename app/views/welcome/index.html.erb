@@ -24,7 +24,7 @@
       <li class="sign-out"><a class="sign-out" href="/sign-out">Sign out</a></li>
     </p>
 
-    <form method="post" action="/" id="form_create" enctype="multipart/form-data">
+    <%= form_for Post.new, html: { multipart: true } do %>
       <ul>
         <li>
           <label for="file">File</label>
@@ -40,7 +40,7 @@
       </ul>
 
       <button>Put HTML</button>
-    </form>
+    <% end %>
   </div>
 <% else %>
   <p class="unit"><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>

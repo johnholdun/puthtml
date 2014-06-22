@@ -17,8 +17,8 @@
       <h1><%= @title %></h1>
     <% end %>
 
-    <% if @error %>
-      <p class="error"><%= @error %></p>
+    <% if flash[:error] %>
+      <p class="error"><%= flash[:error] %></p>
     <% end %>
 
     <%= yield %>
