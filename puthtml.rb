@@ -199,10 +199,16 @@ class PutHTML < Sinatra::Base
       return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/edit-put/#{ path }"
     end
 
-    clean_path = path.sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
+    # determine the canonical path for wherever we are by
+    # removing a trailing slash, .html or .htm, and any illegal characters
+    clean_path = path.sub(/\/$/, '').sub(/\.html?$/, '').sub(/[^a-zA-Z0-9_\-.\/]/, '')
 
     if path != clean_path
       return redirect to ("/#{ clean_path }")
+    end
+
+    if path.split('/').size == 1
+      return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/#{ path }"
     end
 
     path += '.html' unless EXTNAMES_BY_MIME_TYPE.values.include?(File.extname(path))
