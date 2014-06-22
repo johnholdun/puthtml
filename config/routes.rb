@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   root 'welcome#index'
 
+  post '/' => 'posts#create'
   resources :posts, except: :show
 
   get ':user_name' => 'users#show', as: :user

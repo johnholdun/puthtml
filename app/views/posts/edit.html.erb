@@ -1,27 +1,28 @@
 <% @title = "Editing #{ @copy ? 'a copy of' : '' } #{ File.basename @post.path }" %>
 
-<%= form_for @post, html: { mathod: 'post', action: '/' } do %>
+<%= form_tag '/',  method: 'post' do %>
   <ul>
     <li class="path">
       <label for="path">Path</label>
       <div class="input-with-extra">
         <span>/<%= current_user.name %>/</span>
-        <input type="text" name="path" id="path" value="<%= @post.path.sub /^#{ current_user.name }\//, '' %>">
+        <input type="text" name="post[path]" id="path" value="<%= @post.path.sub /^#{ current_user.name }\//, '' %>">
       </div>
     </li>
     <li class="contents">
       <label for="contents">Contents</label>
-      <textarea name="contents" id="contents"><%= @post.contents %></textarea>
+      <textarea name="post[contents]" id="contents"><%= @post.contents %></textarea>
+
+      <div id="editor"></div>
+
     </li>
   </ul>
 
   <button>Put HTML</button>
 <% end %>
 
-<div id="editor"></div>
-
 <script src="//code.jquery.com/jquery-1.7.min.js"></script>
-<script src="<%= asset_path 'javascripts/ace-src-min/ace.js' %>"></script>
+<script src="/static/javascripts/ace-src-min/ace.js"></script>
 <script>
   (function(){
     var

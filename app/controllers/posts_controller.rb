@@ -15,9 +15,9 @@ class PostsController < ApplicationController
     @post = current_user.posts.new post_params
 
     if @post.save then
-      redirect_to @post
+      redirect_to @post.path
     else
-      render :new
+      render :edit
     end
   end
 
@@ -35,7 +35,7 @@ class PostsController < ApplicationController
     @post = current_user.posts.find(params[:id])
 
     if @post.update_attributes(post_params) then
-      redirect_to @post
+      redirect_to @post.path
     else
       render :edit
     end
