@@ -3,6 +3,13 @@ class User < ActiveRecord::Base
 
   before_create :generate_api_key
 
+  def self.create_with_omniauth(auth)
+    create! do |user|
+      user.uid = auth["uid"]
+      user.name = auth["info"]["nickname"]
+    end
+  end
+
   # THIS IS DESPICABLE
   # CHANGE IT
   def profile

@@ -14,9 +14,17 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||= User.first
+    user_id = cookies.permanent.signed[:user_id]
+    @current_user ||= User.find_by_uid(user_id) if user_id.present?
   end
   helper_method :current_user
+
+  def client
+    @client ||= Twitter::REST::Client.new do |config|
+      config.consumer_key = ENV['CONSUMER_KEY']
+      config.consumer_secret = ENV['CONSUMER_SECRET']
+    end
+  end
 
   def require_content_host
     if request.host != CONTENT_HOST

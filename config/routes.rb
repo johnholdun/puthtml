@@ -8,4 +8,8 @@ Rails.application.routes.draw do
   get 'edit-put/*path' => 'posts#edit'
   delete '*path' => 'posts#destroy'
   get '*path' => 'posts#show'
+
+  get '/auth/twitter/callback', to: 'sessions#create', as: 'callback'
+  get '/auth/failure', to: 'sessions#error', as: 'failure'
+  delete '/signout', to: 'sessions#destroy', as: 'signout'
 end
