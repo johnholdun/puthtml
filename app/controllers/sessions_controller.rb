@@ -1,12 +1,14 @@
 class SessionsController < ApplicationController
+  before_filter :require_app_host
+
   def create
     unless current_user
       auth = request.env['omniauth.auth']
-      user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) ||
+      user = User.find_by_uid(auth["uid"]) ||
              User.create_with_omniauth(auth)
       cookies.permanent.signed[:user_id] = user.uid
     end
-    redirect_to show_path, notice: 'Signed in'
+    redirect_to root_path, notice: 'All signed in, champ.'
   end
 
   def show
