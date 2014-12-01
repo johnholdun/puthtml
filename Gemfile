@@ -1,3 +1,4 @@
+ruby '2.1.2'
 source 'https://rubygems.org'
 
 
@@ -45,4 +46,6 @@ gem 'aws-sdk'
 gem 'redis'
 gem 'omniauth'
 gem 'omniauth-twitter'
+
+gem 'powder', group: :development
 # gem 'yaml'
