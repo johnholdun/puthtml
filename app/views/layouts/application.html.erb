@@ -17,8 +17,10 @@
       <h1><%= @title %></h1>
     <% end %>
 
-    <% if flash[:error] %>
-      <p class="error"><%= flash[:error] %></p>
+    <% %w[notice error].each do |key| %>
+      <% if flash[key.to_sym] %>
+        <p class="<%= key %>"><%= flash[key.to_sym] %></p>
+      <% break; end %>
     <% end %>
 
     <%= yield %>

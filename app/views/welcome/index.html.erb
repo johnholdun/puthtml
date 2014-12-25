@@ -21,20 +21,24 @@
           </form>
         </details>
       </li>
-      <li class="sign-out"><a class="sign-out" href="/sign-out">Sign out</a></li>
+      <li class="sign-out">
+        <%= form_tag '/sign-out', method: :delete, class: 'sign-out' do %>
+          <button>Sign out</button>
+        <% end %>
+      </li>
     </p>
 
     <%= form_for Post.new, html: { multipart: true } do %>
       <ul>
         <li>
           <label for="file">File</label>
-          <input type="file" name="file" id="file">
+          <input type="file" name="post[file]" id="file">
         </li>
         <li>
           <label for="path">Path (leave blank for auto)</label>
           <div class="input-with-extra">
             <span>/<%= current_user.name %>/</span>
-            <input type="text" name="path" id="path">
+            <input type="text" name="post[path]" id="path">
           </div>
         </li>
       </ul>
