@@ -6,10 +6,10 @@ Rails.application.routes.draw do
 
   get '/auth/twitter/callback', to: 'sessions#create', as: 'callback'
   get '/auth/failure', to: 'sessions#error', as: 'failure'
-  delete '/signout', to: 'sessions#destroy', as: 'signout'
+  delete '/sign-out', to: 'sessions#destroy', as: 'signout'
 
   get ':user_name' => 'users#show', as: :user
   get 'edit-put/*path' => 'posts#edit'
   delete '*path' => 'posts#destroy'
-  get '*path' => 'posts#show'
+  get '*path' => 'posts#show', constraints: { path: /(?!.*?auth\/).*/ }
 end
