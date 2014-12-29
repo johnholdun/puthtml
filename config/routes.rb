@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   get '/auth/failure', to: 'sessions#error', as: 'failure'
   delete '/sign-out', to: 'sessions#destroy', as: 'signout'
 
+  post '/settings/api-key' => 'users#generate_api_key'
+
   get ':user_name' => 'users#show', as: :user
   get 'edit-put/*path' => 'posts#edit'
   delete '*path' => 'posts#destroy'

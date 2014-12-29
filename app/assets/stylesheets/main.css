@@ -101,6 +101,7 @@ summary:before {
 .profile a, .api-key summary, .sign-out button {
   background: none;
   padding: 0;
+  font: inherit;
   font-size: 0.75em;
   line-height: 1.333em;
   color: #999;
@@ -262,9 +263,9 @@ h2, h3 {
   top: 0;
   bottom: 0;
   width: 2em;
-  background: -webkit-linear-gradient(0, transparent, #fff);
-  background: -moz-linear-gradient(0, transparent, #fff);
-  background: linear-gradient(0, transparent, #fff);
+  background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
+  background: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
 }
 
 #documents .user, #documents .partial-path {
@@ -281,14 +282,19 @@ h2, h3 {
 }
 
 #documents .user:after, #documents .partial-path *:after {
-  content: " ";
   display: inline-block;
+  content: "/";
+  margin: 0 -4px 0 0;
+  color: #ccc;
+  /*
+  content: " ";
   width: 0;
   height: 0;
   border: 4px solid transparent;
   border-left-color: #ccc;
   margin-right: -4px;
   margin-left: 1ex;
+  */
 }
 
 #documents .title {
@@ -301,11 +307,18 @@ h2, h3 {
   text-overflow: ellipsis;
 }
 
+#documents .extension {
+  color: #999;
+  font-weight: normal;
+}
+
 #documents aside {
   color: #BBB;
   display: block;
   opacity: 0;
-  -webkit-transition-duration: 0.2s;
+  -webkit-transition: 0.2s opacity;
+  -moz-transition: 0.2s opacity;
+  transition: 0.2s opacity;
 }
 
 #documents li:hover aside {

@@ -15,14 +15,14 @@
 
 <% if @latest_documents.present? %>
   <div class="unit">
-    <h2>Latest documents by <%= @user.name %></h2>
+    <h2>Latest uploads by <%= @user.name %></h2>
     <%= render 'posts/list', posts: @latest_documents %>
   </div>
 <% end %>
 
 <% if @greatest_documents.present? %>
   <div class="unit">
-    <h2>Greatest documents by <%= @user.name %></h2>
+    <h2>Greatest uploads by <%= @user.name %></h2>
     <%= render 'posts/list', posts: @greatest_documents %>
   </div>
 <% end %>
