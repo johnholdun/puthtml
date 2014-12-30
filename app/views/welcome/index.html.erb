@@ -12,13 +12,13 @@
           <summary>See your API key</summary>
           <p>Put HTML from anywhere! Just send a multipart POST request to <tt>http://www.puthtml.com/</tt> with parameters for <tt>file</tt>, <tt>path</tt> (optional), and <tt>api_key</tt>, which should be set to this:</p>
           <p class="key"><tt><%= current_user.api_key %></tt></p>
-          <form action="/settings/api-key" method="post">
+          <%= form_tag '/settings/api-key', method: 'post' do %>
             <p>
               Stuff getting too weird?
               <button class="link">Reset your API key</button>
               and pray for the best.
             </p>
-          </form>
+          <% end %>
         </details>
       </li>
       <li class="sign-out">
@@ -50,16 +50,16 @@
   <p class="unit"><a class="sign-in" href="/auth/twitter">Sign in with Twitter</a></p>
 <% end %>
 
-<% if @latest_documents.size > 0 %>
+<% if @latest_documents.present? %>
   <div class="unit">
-    <h2>Latest documents</h2>
+    <h2>Latest uploads</h2>
     <%= render 'posts/list', posts: @latest_documents %>
   </div>
 <% end %>
 
-<% if @greatest_documents.size > 0 %>
+<% if @greatest_documents.present? %>
   <div class="unit">
-    <h2>Greatest documents</h2>
+    <h2>Greatest uploads</h2>
     <%= render 'posts/list', posts: @greatest_documents %>
   </div>
 <% end %>

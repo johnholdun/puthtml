@@ -65,6 +65,14 @@ class Post < ActiveRecord::Base
     @title ||= path.to_s.split('/').last
   end
 
+  def title_without_extension
+    title.sub(/\.[^.]+$/, '')
+  end
+
+  def extension
+    title.sub %r[^#{ title_without_extension }], ''
+  end
+
   def fix_pathname
     clean_path = self.path
       .sub(/#{ File.extname(self.path) }$/, '')

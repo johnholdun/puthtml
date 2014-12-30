@@ -35,9 +35,7 @@ class PostsController < ApplicationController
   end
 
   def edit
-    path = params[:path].sub %r[^/edit-put/], ''
-
-    @post = Post.find_by_path path
+    @post = Post.find_by_path params[:path]
     raise ActiveRecord::RecordNotFound unless @post
 
     @copy = !(@post.user == current_user)
