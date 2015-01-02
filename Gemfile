@@ -49,3 +49,9 @@ gem 'omniauth-twitter'
 
 gem 'powder', group: :development
 # gem 'yaml'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'capybara'
+end

@@ -19,6 +19,18 @@ class SessionsController < ApplicationController
     end
   end
 
+  def backdoor
+    unless Rails.env.production?
+      user = User.find_by_name params[:username]
+      if user.present?
+        cookies.permanent.signed[:user_id] = user.uid
+        flash.notice = 'Our little secret.'
+      end
+    end
+
+    redirect_to root_path
+  end
+
   def error
     flash[:error] = 'Sign in with Twitter failed'
     redirect_to root_path
