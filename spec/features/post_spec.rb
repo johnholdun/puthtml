@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 RSpec.describe 'post upload actions', type: :feature do
   before :each do
     # Bypass OAuth and return to home page

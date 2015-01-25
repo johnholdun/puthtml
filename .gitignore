@@ -3,3 +3,4 @@ tmp
 *.db
 db/*.sqlite3
 log/*.log
+public/user_files

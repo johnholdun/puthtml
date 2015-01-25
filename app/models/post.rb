@@ -19,12 +19,22 @@ class Post < ActiveRecord::Base
 
   Bucket = AWS::S3.new.buckets[ENV['AWS_BUCKET_NAME']] rescue nil
 
+  class << self
+    attr_writer :file_store
+
+    def file_store
+      raise('No file store defined!') unless defined? @file_store
+      @file_store
+    end
+  end
+
   belongs_to :user
 
   validates :contents, presence: true
   validates :path, presence: true
   validate :acceptable_mime_type
   validate :file_small_enough
+
   before_save :fix_pathname
   after_save :write_contents
   after_destroy :delete_object
@@ -47,7 +57,7 @@ class Post < ActiveRecord::Base
       # (i'm not sure this actually gains us anything)
       open(file.tempfile).read(MAX_FILE_SIZE + 1)
     else
-      Bucket.objects[path].read # rescue nil
+      self.class.file_store.get path
     end
   end
 
@@ -111,10 +121,10 @@ class Post < ActiveRecord::Base
   end
 
   def write_contents
-    Bucket.objects[path(false)].write contents, acl: :authenticated_read
+    self.class.file_store.set path(false), contents
   end
 
   def delete_object
-    Bucket.objects[path].delete if path.present?
+    self.class.file_store.delete(path) if path.present?
   end
 end

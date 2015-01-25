@@ -80,4 +80,6 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  Post.file_store = AmazonFileStore.new ENV['AWS_BUCKET_NAME']
 end

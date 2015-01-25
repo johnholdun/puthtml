@@ -1,13 +1,17 @@
+require 'spec_helper'
+
 RSpec.describe 'user actions', type: :feature do
+  let(:username) { 'jeeplanger' }
+
   before :each do
     # This signs us in, short-circuiting the OAuth routes, which we don't control and cannot test.
     # It also brings us back to the root path!
-    visit '/auth/backdoor/jeeplanger'
+    visit "/auth/backdoor/#{ username }"
   end
 
   it 'links to my profile' do
     click_link 'Visit your profile'
-    expect(page).to have_content 'jeeplanger'
+    expect(page).to have_content username
   end
 
   it 'resets my API key' do
