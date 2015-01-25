@@ -37,4 +37,8 @@ Rails.application.configure do
 
   CONTENT_HOST = 'i.puthtml.dev'
   APP_HOST = 'www.puthtml.dev'
+
+  file_store_path = Rails.public_path.join 'user_files'
+  Dir.mkdir(file_store_path) unless Dir.exists?(file_store_path)
+  Post.file_store = LocalFileStore.new file_store_path
 end
