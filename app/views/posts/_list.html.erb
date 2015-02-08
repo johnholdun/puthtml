@@ -1,7 +1,7 @@
 <ul id="documents">
   <% posts.each do |post| %>
     <li data-user="<%= post.user.name %>">
-      <a class="title" href="<%= post.path %>" target="_blank">
+      <a class="title" href="<%= post_path post %>" target="_blank">
         <span class="meta">
           <em class="user"><%= post.user.name %></em>
           <% if post.partial_path.present? %>
@@ -20,11 +20,11 @@
           <span class="time"><%= post.updated_at.strftime('%b %-e %-l:%M%P') %></span>
         <% end %>
         <% if post.views > 0 %>
-          <span class="views"><%= post.views.with_delimiter %> <%= 'view'.pluralize post.views %></span>
+          <span class="views"><%= number_with_delimiter post.views %> <%= 'view'.pluralize post.views %></span>
         <% end %>
-        <a class="edit" href="/edit-put/<%= post.path %>"><%= (post.user == current_user) ? 'Edit' : 'Copy' %></a>
+        <a class="edit" href="/edit-put/<%= post.path_with_user %>"><%= (post.user == current_user) ? 'Edit' : 'Copy' %></a>
         <% if current_user and post.user == current_user %>
-          <%= form_tag "/#{ post.path }", method: :delete, class: 'delete' do %>
+          <%= form_tag post_path(post, false), method: :delete, class: 'delete' do %>
             <input type="hidden" name="_method" value="delete">
             <button class="destructive link">Delete</button>
           <% end %>

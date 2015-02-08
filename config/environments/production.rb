@@ -81,5 +81,8 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  CONTENT_HOST = 'i.puthtml.com'
+  APP_HOST = 'www.puthtml.com'
+
   Post.file_store = AmazonFileStore.new ENV['AWS_BUCKET_NAME']
 end

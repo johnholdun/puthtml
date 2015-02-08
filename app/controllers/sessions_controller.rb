@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   def create
     unless current_user
       auth = request.env['omniauth.auth']
-      user = User.find_by_uid(auth["uid"]) ||
+      user = User.find_by_uid(auth['uid']) ||
              User.create_with_omniauth(auth)
       cookies.permanent.signed[:user_id] = user.uid
     end
