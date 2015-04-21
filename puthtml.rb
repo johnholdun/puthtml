@@ -22,11 +22,6 @@ DataMapper.auto_upgrade!
 class PutHTML < Sinatra::Base
   use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
 
-  configure do
-    set :session_secret, ENV['COOKIE_SECRET']
-    enable :sessions
-  end
-
   set :assets_precompile, %w[*.css *.js]
   register Sinatra::AssetPipeline
 
@@ -223,9 +218,9 @@ class PutHTML < Sinatra::Base
     else
       #redirect to homepage if nothing found? (should this 404?)
       return redirect to "#{ request.scheme }://#{ PUTHTML_APP_HOST }/"
-    end 
+    end
   end
-    
+
   get '/:username' do
     @user = User.first_or_new(name: params[:username])
     profile = JSON.load(Bucket.objects["#{ @user.name }/profile.json"].read) rescue nil
@@ -247,7 +242,7 @@ class PutHTML < Sinatra::Base
       return redirect PUTHTML_CONTENT_URL + "#{ params[:username] }/#{ params[:splat].join('/') }", 301
     end
   end
-  
+
   post '/' do
     authenticated_user = params[:api_key].present? ? User.first(api_key: params[:api_key]) : current_user
     if authenticated_user.nil?

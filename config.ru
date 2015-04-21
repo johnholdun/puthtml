@@ -3,7 +3,10 @@ require 'bundler'
 require 'rack/csrf'
 
 Bundler.require
-use Rack::Session::Cookie, secret: ENV['COOKIE_SECRET']
+use Rack::Session::Cookie,
+  key: 'rack.session',
+  path: '/',
+  secret: ENV['COOKIE_SECRET']
 use Rack::Logger
 
 use Rack::Csrf, :raise => true, :check_only => ['POST:/'], :skip_if => lambda { |request|
