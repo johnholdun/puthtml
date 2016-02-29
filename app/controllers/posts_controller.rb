@@ -2,7 +2,10 @@ class PostsController < ApplicationController
   before_filter :require_app_host, only: %w[edit destroy]
   before_filter :require_content_host, only: :show
 
-  protect_from_forgery unless: Proc.new{ |c| c.params.is_a?(Hash) and c.params[:action] == 'create' and c.params.key? :api_key }
+  protect_from_forgery \
+    unless: proc { |c|
+      c.params.is_a?(Hash) && c.params[:action] == 'create' && c.params.key?(:api_key)
+    }
 
   def show
     # @todo Consider avoiding a DB request here in favor of Post.file_store.get params[:path]
@@ -32,7 +35,9 @@ class PostsController < ApplicationController
       current_user
     end
 
-    post = Post.find_by_user_name_and_path(user.name, post_params[:path]) || user.posts.new
+    path = post_params[:path].present? ? post_params[:path] : post_params[:file].try(:original_filename)
+
+    post = Post.find_by_user_name_and_path(user.name, path) || user.posts.new
 
     post.attributes = post_params
 

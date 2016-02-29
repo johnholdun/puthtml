@@ -1,24 +1,32 @@
-<% @title = "Editing #{ copy ? 'a copy of' : '' } #{ File.basename post.path }" %>
+<% @title = "Editing #{ copy ? 'a copy of' : '' } #{ post.basename }" %>
+
+<% if post.errors.any? %>
+  <p class="error">You cannot put an empty HTML!</p>
+<% end %>
 
 <%= form_tag '/', method: 'post', id: 'form_edit' do %>
   <ul>
     <li class="path">
-      <label for="path">Path</label>
+      <label for="path">
+        Path
+      </label>
       <div class="input-with-extra">
         <span>/<%= current_user.name %>/</span>
-        <input type="text" name="post[path]" id="path" value="<%= post.path.sub /^#{ current_user.name }\//, '' %>">
+        <input type="text" name="post[path]" id="path" value="<%= post.path.to_s.sub /^#{ current_user.name }\//, '' %>">
       </div>
     </li>
     <li class="contents">
-      <label for="contents">Contents</label>
+      <label for="contents">
+        Contents
+      </label>
       <textarea name="post[contents]" id="contents"><%= post.contents %></textarea>
-
       <div id="editor"></div>
-
     </li>
   </ul>
 
-  <button>Put HTML</button>
+  <button>
+    Put HTML
+  </button>
 <% end %>
 
 <script src="/static/javascripts/ace-src-min/ace.js"></script>
@@ -38,7 +46,7 @@
     editorSession.setMode("ace/mode/<%= post.mode %>");
     editorSession.setUseWorker(false);
     editorSession.setValue(textarea.value);
-    editorSession.on('change', function(){
+    editorSession.on("change", function(){
       textarea.value = editorSession.getValue();
     });
   })();

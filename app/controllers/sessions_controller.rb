@@ -4,19 +4,17 @@ class SessionsController < ApplicationController
   def create
     unless current_user
       auth = request.env['omniauth.auth']
-      user = User.find_by_uid(auth['uid']) ||
-             User.create_with_omniauth(auth)
+      user =
+        User.find_by_uid(auth['uid']) ||
+       User.create_with_omniauth(auth)
       cookies.permanent.signed[:user_id] = user.uid
     end
     redirect_to root_path, notice: 'All signed in, champ.'
   end
 
   def show
-    if current_user
-      @twitter_user = client.user(include_entities: true)
-    else
-      redirect_to failure_path
-    end
+    return redirect_to(failure_path) unless current_user
+    @twitter_user = client.user(include_entities: true)
   end
 
   def backdoor
