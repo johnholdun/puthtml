@@ -27,19 +27,24 @@ class ApplicationController < ActionController::Base
   end
 
   def require_content_host
-    if request.host != CONTENT_HOST
+    if CONTENT_HOST.present? && request.host != CONTENT_HOST
       redirect_to "#{ request.scheme }://#{ CONTENT_HOST }#{ request.path }", status: 301
       return
     end
   end
   helper_method :require_content_host
 
-
   def require_app_host
-    if request.host != APP_HOST
+    if APP_HOST.present? && request.host != APP_HOST
       redirect_to "#{ request.scheme }://#{ APP_HOST }#{ request.path }"
       return
     end
   end
   helper_method :require_content_host
+
+  def post_path(post, include_host = true)
+    host = "#{ request.scheme }://#{ CONTENT_HOST }" if include_host
+    "#{ host }/#{ post.path_with_user.sub /\.html$/, '' }"
+  end
+  helper_method :post_path
 end

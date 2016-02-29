@@ -1,34 +1,60 @@
 require 'spec_helper'
 
 RSpec.describe 'post upload actions', type: :feature do
+  let(:username) { Faker::Internet.user_name nil, %w(_) }
+  let!(:user) { User.create name: username, uid: SecureRandom.random_number(10_000).to_s }
+
+  let(:html_file_contents) { '<h1>This is my file</h1>' }
+  let(:html_file) {
+    Tempfile.new(%w(test .html)).tap { |file|
+      file.write html_file_contents
+      file.close
+    }
+  }
+
+  let(:json_file_contents) { '{"json":true}' }
+  let(:json_file) {
+    Tempfile.new(%w(test .json)).tap { |file|
+      file.write json_file_contents
+      file.close
+    }
+  }
+
   before :each do
     # Bypass OAuth and return to home page
-    visit '/auth/backdoor/jeeplanger'
-
-    @file_contents = '<h1>This is my file</h1>'
-
-    @file = Tempfile.new 'html'
-    @file.write @file_contents
-    @file.close
+    visit "/auth/backdoor/#{ username }"
   end
 
   after :each do
-    @file.unlink
+    html_file.unlink
   end
 
-  it 'uploads a post without a path' do
-    attach_file 'post[file]', @file.path
+  it 'uploads an HTML page without a path' do
+    attach_file 'post[file]', html_file.path
     click_button 'Put HTML'
 
     # Then we are redirected to our file...
 
-    expect(page.body).to eq(@file_contents)
+    basename_without_extension = File.basename(html_file.path).sub /#{ File.extname html_file.path }$/, ''
+
+    expect(current_url).to end_with(basename_without_extension)
+    expect(page.body).to eq(html_file_contents)
+  end
+
+  it 'uploads a JSON doc without a path' do
+    attach_file 'post[file]', json_file.path
+    click_button 'Put HTML'
+
+    # Then we are redirected to our file...
+
+    expect(current_url).to end_with(File.basename json_file.path)
+    expect(page.body).to eq(json_file_contents)
   end
 
   it 'uploads a post with a path' do
     post_path = 'super-cool'
 
-    attach_file 'post[file]', @file.path
+    attach_file 'post[file]', html_file.path
     fill_in 'post[path]', with: post_path
 
     click_button 'Put HTML'
@@ -37,21 +63,21 @@ RSpec.describe 'post upload actions', type: :feature do
 
     uri = URI.parse current_url
 
-    expect(uri.path).to eq("/jeeplanger/#{ post_path }.html")
-    expect(page.body).to eq(@file_contents)
+    expect(uri.path).to eq("/#{ File.join username, post_path }")
+    expect(page.body).to eq(html_file_contents)
   end
 
   it 'deletes a post' do
     post_path = 'super-cool-to-delete'
 
-    attach_file 'post[file]', @file.path
+    attach_file 'post[file]', html_file.path
     fill_in 'post[path]', with: post_path
 
     click_button 'Put HTML'
 
     visit '/'
 
-    button_selector = "form.delete[action='/jeeplanger/#{ post_path }.html'] button"
+    button_selector = "form.delete[action='/#{ username }/#{ post_path }'] button"
 
     button = first button_selector
 
@@ -62,7 +88,5 @@ RSpec.describe 'post upload actions', type: :feature do
 end
 
 RSpec.describe 'post actions', type: :feature do
-  it 'updates view counts'
-
   it 'copies a post'
 end

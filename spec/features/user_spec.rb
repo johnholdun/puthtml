@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe 'user actions', type: :feature do
   let(:username) { 'jeeplanger' }
+  let!(:user) { User.create name: username, uid: SecureRandom.random_number(10_000).to_s }
 
   before :each do
     # This signs us in, short-circuiting the OAuth routes, which we don't control and cannot test.

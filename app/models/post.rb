@@ -32,6 +32,7 @@ class Post < ActiveRecord::Base
 
   validates :contents, presence: true
   validates :path, presence: true
+  validates_uniqueness_of :path, scope: :user_id
   validate :acceptable_mime_type
   validate :file_small_enough
 
@@ -41,6 +42,11 @@ class Post < ActiveRecord::Base
 
   attr_writer :contents
   attr_accessor :file
+
+  def self.find_by_user_name_and_path(user_name, path)
+    path += '.html' unless File.extname(path).present?
+    Post.includes(:user).where(users: { name: user_name }, path: path).first
+  end
 
   def path cached = true
     return @path if cached and defined?(@path) and @path.present?
@@ -57,7 +63,7 @@ class Post < ActiveRecord::Base
       # (i'm not sure this actually gains us anything)
       open(file.tempfile).read(MAX_FILE_SIZE + 1)
     else
-      self.class.file_store.get path
+      self.class.file_store.get path_with_user
     end
   end
 
@@ -87,9 +93,8 @@ class Post < ActiveRecord::Base
     clean_path = self.path
       .sub(/#{ File.extname(self.path) }$/, '')
       .gsub(/[^a-zA-Z0-9_\-\/]/, '')
-      .sub(%r[^#{ self.user.name }/]i, '')
 
-    self.path = "#{ self.user.name.downcase }/#{ clean_path }#{ EXTNAMES_BY_MIME_TYPE[self.content_type] }"
+    self.path = "#{ clean_path }#{ extname }"
   end
 
   def content_type
@@ -100,8 +105,16 @@ class Post < ActiveRecord::Base
     @content_type = Rack::Mime::MIME_TYPES[extname]
   end
 
+  def extname
+    EXTNAMES_BY_MIME_TYPE[content_type] || '.html'
+  end
+
   def partial_path
-    @partial_path ||= path.split('/')[1 .. -2].join('/') rescue ''
+    @partial_path ||= path.split('/')[0 .. -2].join('/') rescue ''
+  end
+
+  def path_with_user
+    "#{ user.name }/#{ path }#{ '.html' unless File.extname(path).present? }"
   end
 
   def views
@@ -121,10 +134,14 @@ class Post < ActiveRecord::Base
   end
 
   def write_contents
-    self.class.file_store.set path(false), contents
+    self.class.file_store.set path_with_user, contents
   end
 
   def delete_object
-    self.class.file_store.delete(path) if path.present?
+    self.class.file_store.delete(path_with_user) if path.present?
+  end
+
+  def mode
+    content_type.split('/').last
   end
 end

@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   post '/settings/api-key' => 'users#generate_api_key'
 
   get ':user_name' => 'users#show', as: :user
-  get 'edit-put/*path' => 'posts#edit'
-  delete '*path' => 'posts#destroy'
-  get '*path' => 'posts#show', constraints: { path: /(?!.*?auth\/).*/ }
+  get 'edit-put/:user_name/*path' => 'posts#edit'
+  delete ':user_name/*path' => 'posts#destroy', constraints: lambda { |req| req.fullpath !~ %r(\A/auth/) }
+  get ':user_name/*path' => 'posts#show', constraints: lambda { |req| req.fullpath !~ %r(\A/auth/) }
 end
