@@ -12,17 +12,10 @@ RSpec.describe PostsController, type: :controller do
       expect(post.reload.views).to eq(5)
     end
 
-    it 'sets content type for HTML' do
+    it 'sets content type' do
       post = user.posts.create path: "#{ path }.html", contents: '<h1>this is viewed</h1>'
       get :show, user_name: username, path: path
       expect(response.content_type).to eq('text/html')
-    end
-
-    it 'sets content type for JSON' do
-      path = "#{ Faker::Internet.slug }.json"
-      post = user.posts.create path: path, contents: '{"json":true}'
-      get :show, user_name: username, path: path
-      expect(response.content_type).to eq('application/json')
     end
   end
 

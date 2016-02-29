@@ -12,14 +12,6 @@ RSpec.describe 'post upload actions', type: :feature do
     }
   }
 
-  let(:json_file_contents) { '{"json":true}' }
-  let(:json_file) {
-    Tempfile.new(%w(test .json)).tap { |file|
-      file.write json_file_contents
-      file.close
-    }
-  }
-
   before :each do
     # Bypass OAuth and return to home page
     visit "/auth/backdoor/#{ username }"
@@ -39,16 +31,6 @@ RSpec.describe 'post upload actions', type: :feature do
 
     expect(current_url).to end_with(basename_without_extension)
     expect(page.body).to eq(html_file_contents)
-  end
-
-  it 'uploads a JSON doc without a path' do
-    attach_file 'post[file]', json_file.path
-    click_button 'Put HTML'
-
-    # Then we are redirected to our file...
-
-    expect(current_url).to end_with(File.basename json_file.path)
-    expect(page.body).to eq(json_file_contents)
   end
 
   it 'uploads a post with a path' do
