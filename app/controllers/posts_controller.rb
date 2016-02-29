@@ -35,7 +35,9 @@ class PostsController < ApplicationController
       current_user
     end
 
-    post = Post.find_by_user_name_and_path(user.name, post_params[:path]) || user.posts.new
+    path = post_params[:path].present? ? post_params[:path] : post_params[:file].try(:original_filename)
+
+    post = Post.find_by_user_name_and_path(user.name, path) || user.posts.new
 
     post.attributes = post_params
 

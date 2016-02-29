@@ -1,4 +1,8 @@
-<% @title = "Editing #{ copy ? 'a copy of' : '' } #{ File.basename post.path }" %>
+<% @title = "Editing #{ copy ? 'a copy of' : '' } #{ post.basename }" %>
+
+<% if post.errors.any? %>
+  <p class="error">You cannot put an empty HTML!</p>
+<% end %>
 
 <%= form_tag '/', method: 'post', id: 'form_edit' do %>
   <ul>
@@ -8,7 +12,7 @@
       </label>
       <div class="input-with-extra">
         <span>/<%= current_user.name %>/</span>
-        <input type="text" name="post[path]" id="path" value="<%= post.path.sub /^#{ current_user.name }\//, '' %>">
+        <input type="text" name="post[path]" id="path" value="<%= post.path.to_s.sub /^#{ current_user.name }\//, '' %>">
       </div>
     </li>
     <li class="contents">

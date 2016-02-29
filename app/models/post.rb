@@ -14,27 +14,23 @@ class Post < ActiveRecord::Base
 
   belongs_to :user
 
+  before_validation :assign_path
+
   validates :contents, presence: true
-  validates :path, presence: true, uniqueness: { scope: :user_id }
+  validates :path, presence: true
+  validates :path, uniqueness: { scope: :user_id }, on: :create
   validate :acceptable_mime_type
   validate :file_small_enough
 
-  before_create :commit_contents
+  before_save :commit_contents
   before_save :fix_pathname
 
   attr_accessor :file
 
   def self.find_by_user_name_and_path(user_name, path)
+    return unless path
     path += '.html' unless File.extname(path).present?
     Post.includes(:user).where(users: { name: user_name }, path: path).first
-  end
-
-  def path(cached = true)
-    return @path if cached and defined?(@path) and @path.present?
-
-    self[:path] = file.try(:original_filename) unless self[:path].present? or self.frozen?
-
-    @path = self[:path]
   end
 
   def contents
@@ -60,6 +56,11 @@ class Post < ActiveRecord::Base
     title.sub %r[^#{ title_without_extension }], ''
   end
 
+  def basename
+    return 'untitled' unless path
+    File.basename path
+  end
+
   def fix_pathname
     clean_path = self.path
       .sub(/#{ File.extname(self.path) }$/, '')
@@ -69,11 +70,13 @@ class Post < ActiveRecord::Base
   end
 
   def content_type
-    return @content_type if defined? @content_type
-    extname = File.extname(path)
-    extname = '.html' unless extname.present?
-
-    @content_type = Rack::Mime::MIME_TYPES[extname]
+    return unless path
+    @content_type ||=
+      begin
+        extname = File.extname path
+        extname = '.html' unless extname.present?
+        Rack::Mime::MIME_TYPES[extname]
+      end
   end
 
   def extname
@@ -93,6 +96,7 @@ class Post < ActiveRecord::Base
   end
 
   def file_small_enough
+    return unless contents
     unless contents.size <= MAX_FILE_SIZE
       errors.add :contents, 'Your file is too large!'
     end
@@ -105,10 +109,20 @@ class Post < ActiveRecord::Base
   end
 
   def mode
+    return 'plain' unless content_type
     content_type.split('/').last
+  end
+
+  private
+
+  def assign_path
+    return true if self[:path].present? or frozen?
+    self[:path] = file.try :original_filename
+    true
   end
 
   def commit_contents
     self.contents = contents
+    true
   end
 end
