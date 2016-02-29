@@ -1,34 +1,55 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8" />
+    <meta name='viewport' content='width=device-width' />
     <% nut = 'Upload something. There it is.' %>
-    <title>&#x261E; Put HTML<%= ": #{ @title || nut }" %></title>
-    <meta name='viewport' content='width=device-width'>
-    <link rel="stylesheet" href="<%= stylesheet_path 'application' %>">
+    <title>
+      &#x261E; Put HTML: <%= @title || nut %>
+    </title>
+    <link rel="stylesheet" href="<%= stylesheet_path 'application' %>" />
   </head>
   <body>
     <header>
-      <h1 id="title"><a href="/">Put HTML</a></h1>
-      <p id="nut"><%= nut %></p>
+      <h1 id="title">
+        <a href="/">Put HTML</a>
+      </h1>
+      <p id="nut">
+        <%= nut %>
+      </p>
     </header>
 
     <% if @title %>
-      <h1><%= @title %></h1>
+      <h1>
+        <%= @title %>
+      </h1>
     <% end %>
 
     <% %w[notice error].each do |key| %>
       <% if flash[key.to_sym] %>
-        <p class="<%= key %>"><%= flash[key.to_sym] %></p>
+        <p class="<%= key %>">
+          <%= flash[key.to_sym] %>
+        </p>
       <% break; end %>
     <% end %>
 
     <%= yield %>
 
     <p class="who-mike-jones g unit">
-      <small><a href="http://twitter.com/puthtml">@puthtml</a></small>
-      <small><a href="http://twitter.com/johnholdun">@johnholdun</a></small>
-      <small><a href="http://twitter.com/negatendo">@negatendo</a></small>
-      <small><a href="http://twitter.com/ckolderup">@ckolderup</a></small>
+      <small>
+        <a href="http://twitter.com/puthtml">
+          @puthtml
+        </a>
+        <a href="http://twitter.com/johnholdun">
+          @johnholdun
+        </a>
+        <a href="http://twitter.com/negatendo">
+          @negatendo
+        </a>
+        <a href="http://twitter.com/ckolderup">
+          @ckolderup
+        </a>
+      </small>
     </p>
   </body>
 </html>
