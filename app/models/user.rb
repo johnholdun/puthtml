@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
       fields = {}
       post = posts.find_by_path("#{ name }/profile.json") || posts.find_by_path("#{ name }/profile.yml")
       if post
-        fields = post.parsed_contents
+        fields = post.contents
       end
       UserProfile.new fields
     end
